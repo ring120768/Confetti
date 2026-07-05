@@ -1,20 +1,43 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 
-// Renders a chat message; ```email blocks become a draft card
-// with Copy and "Open in your email app" actions.
-function Message({ role, content }) {
+// Renders a chat message WhatsApp-style: Buzz's avatar sits beside her
+// bubbles; ```email blocks become a draft card with Copy / mailto actions.
+function Message({ role, content, time }) {
   const parts = content.split(/```email\n?([\s\S]*?)```/g)
-  return (
+  const bubble = (
     <div className={'bubble ' + role}>
       {parts.map((part, i) =>
         i % 2 === 0
           ? (part.trim() ? <span key={i}>{part}</span> : null)
           : <EmailDraft key={i} draft={part.trim()} />
       )}
+      {time && <span className="stamp">{time}</span>}
+    </div>
+  )
+  if (role !== 'assistant') return <div className="msg-row user">{bubble}</div>
+  return (
+    <div className="msg-row assistant">
+      <img src="/buzz.png" alt="" className="avatar" />
+      {bubble}
     </div>
   )
 }
+
+function Typing() {
+  return (
+    <div className="msg-row assistant">
+      <img src="/buzz.png" alt="" className="avatar" />
+      <div className="bubble assistant typing">
+        <span className="dot" /><span className="dot" /><span className="dot" />
+      </div>
+    </div>
+  )
+}
+
+const stamp = (iso) => iso
+  ? new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  : new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 
 function EmailDraft({ draft }) {
   const [copied, setCopied] = useState(false)
@@ -51,7 +74,7 @@ export default function Buzz({ wedding }) {
 
   useEffect(() => {
     if (!open) return
-    supabase.from('ai_messages').select('role,content')
+    supabase.from('ai_messages').select('role,content,created_at')
       .eq('wedding_id', wedding.id).order('created_at').limit(50)
       .then(({ data }) => setMessages(data || []))
   }, [open, wedding.id])
@@ -104,8 +127,8 @@ export default function Buzz({ wedding }) {
           <p className="meta">Ask me anything — "what should we be doing this month?",
           "how much do flowers cost?", "what do I ask a photographer?" 🐝</p>
         )}
-        {messages.map((m, i) => <Message key={i} role={m.role} content={m.content} />)}
-        {busy && <div className="bubble assistant">…</div>}
+        {messages.map((m, i) => <Message key={i} role={m.role} content={m.content} time={stamp(m.created_at)} />)}
+        {busy && <Typing />}
         <div ref={bottomRef} />
       </div>
       <form onSubmit={send} className="buzz-input">

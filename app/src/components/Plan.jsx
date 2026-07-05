@@ -3,6 +3,25 @@ import { supabase } from '../lib/supabase.js'
 import { PHASES, currentPhase, groupByPhase, phaseProgress, dueDate, isOverdue, formatDue } from '../lib/engine.js'
 import Buzz from './Buzz.jsx'
 
+// A little confetti burst from the ticked checkbox — brand moment.
+const CONFETTI = ['#F7D6B8', '#F4C9C5', '#F5E6A8', '#C9DCEA', '#C8E0CC', '#D6CCE4', '#D49A2E']
+function confettiBurst(el) {
+  const { left, top, width, height } = el.getBoundingClientRect()
+  const cx = left + width / 2, cy = top + height / 2
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div')
+    p.className = 'confetti-piece'
+    p.style.left = cx + 'px'
+    p.style.top = cy + 'px'
+    p.style.background = CONFETTI[i % CONFETTI.length]
+    p.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px')
+    p.style.setProperty('--dy', (Math.random() * -90 - 20) + 'px')
+    if (i % 3 === 0) p.style.borderRadius = '50%'
+    document.body.appendChild(p)
+    setTimeout(() => p.remove(), 950)
+  }
+}
+
 // The journey ribbon + current-phase task list.
 export default function Plan({ wedding }) {
   const [tasks, setTasks] = useState([])
@@ -20,8 +39,9 @@ export default function Plan({ wedding }) {
   const groups = useMemo(() => groupByPhase(tasks, library), [tasks, library])
   const shown = selected || current
 
-  async function toggle(task) {
+  async function toggle(task, e) {
     const status = task.status === 'done' ? 'todo' : 'done'
+    if (status === 'done' && e?.target) confettiBurst(e.target)
     setTasks(ts => ts.map(t => t.id === task.id ? { ...t, status } : t)) // optimistic
     const { error } = await supabase.from('tasks').update({ status }).eq('id', task.id)
     if (error) setTasks(ts => ts.map(t => t.id === task.id ? { ...t, status: task.status } : t))
@@ -55,7 +75,7 @@ export default function Plan({ wedding }) {
         {groups[shown]?.length === 0 && <p>Nothing in this phase — enjoy the calm!</p>}
         {groups[shown]?.map(t => (
           <div key={t.id} className={'task' + (t.status === 'done' ? ' done' : '')}>
-            <input type="checkbox" checked={t.status === 'done'} onChange={() => toggle(t)} />
+            <input type="checkbox" checked={t.status === 'done'} onChange={(e) => toggle(t, e)} />
             <div>
               <div className="title">{t.title}</div>
               <div className="meta">
