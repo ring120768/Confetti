@@ -1,0 +1,118 @@
+import { useEffect, useRef, useState } from 'react'
+import { supabase } from '../lib/supabase.js'
+
+// Renders a chat message; ```email blocks become a draft card
+// with Copy and "Open in your email app" actions.
+function Message({ role, content }) {
+  const parts = content.split(/```email\n?([\s\S]*?)```/g)
+  return (
+    <div className={'bubble ' + role}>
+      {parts.map((part, i) =>
+        i % 2 === 0
+          ? (part.trim() ? <span key={i}>{part}</span> : null)
+          : <EmailDraft key={i} draft={part.trim()} />
+      )}
+    </div>
+  )
+}
+
+function EmailDraft({ draft }) {
+  const [copied, setCopied] = useState(false)
+  const to = draft.match(/^To:\s*(.*)$/m)?.[1]?.trim() || ''
+  const subject = draft.match(/^Subject:\s*(.*)$/m)?.[1]?.trim() || 'Wedding enquiry'
+  const body = draft.replace(/^To:.*$/m, '').replace(/^Subject:.*$/m, '').trim()
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(draft)
+    setCopied(true); setTimeout(() => setCopied(false), 2000)
+  }
+  const mailto = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+
+  return (
+    <div className="email-draft">
+      <div className="meta">✉️ {to ? `To: ${to}` : 'Add the supplier\'s email address'} · {subject}</div>
+      <pre>{body}</pre>
+      <div className="draft-actions">
+        <button type="button" className="secondary" onClick={copy}>{copied ? 'Copied ✓' : 'Copy'}</button>
+        <a href={mailto}><button type="button">Open in your email app</button></a>
+      </div>
+    </div>
+  )
+}
+
+// Buzz chat: floating button -> slide-up panel.
+export default function Buzz({ wedding }) {
+  const [open, setOpen] = useState(false)
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [quota, setQuota] = useState(null) // { used, quota }
+  const bottomRef = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    supabase.from('ai_messages').select('role,content')
+      .eq('wedding_id', wedding.id).order('created_at').limit(50)
+      .then(({ data }) => setMessages(data || []))
+  }, [open, wedding.id])
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, open])
+
+  async function send(e) {
+    e.preventDefault()
+    const text = input.trim()
+    if (!text || busy) return
+    setInput('')
+    setMessages(m => [...m, { role: 'user', content: text }])
+    setBusy(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('buzz', { body: { message: text } })
+      if (error) {
+        // supabase-js wraps non-2xx; try to read our error body
+        let detail = 'Buzz is having a moment — try again shortly.'
+        try {
+          const body = await error.context?.json()
+          if (body?.error === 'quota') detail = body.detail + ' Upgrade for more. ✨'
+          else if (body?.error) detail = body.error
+        } catch { /* keep default */ }
+        setMessages(m => [...m, { role: 'assistant', content: detail }])
+      } else {
+        setMessages(m => [...m, { role: 'assistant', content: data.reply }])
+        setQuota({ used: data.used, quota: data.quota })
+      }
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (!open) return (
+    <button className="buzz-fab" onClick={() => setOpen(true)} aria-label="Chat with Buzz">
+      <img src="/buzz.png" alt="" /> Ask Buzz
+    </button>
+  )
+
+  return (
+    <div className="buzz-panel card">
+      <div className="buzz-head">
+        <img src="/buzz.png" alt="" className="buzz-inline" />
+        <strong>Buzz</strong>
+        {quota && <span className="badge">{quota.used}/{quota.quota} this month</span>}
+        <button className="secondary" onClick={() => setOpen(false)}>Close</button>
+      </div>
+      <div className="buzz-thread">
+        {messages.length === 0 && (
+          <p className="meta">Ask me anything — "what should we be doing this month?",
+          "how much do flowers cost?", "what do I ask a photographer?" 🐝</p>
+        )}
+        {messages.map((m, i) => <Message key={i} role={m.role} content={m.content} />)}
+        {busy && <div className="bubble assistant">…</div>}
+        <div ref={bottomRef} />
+      </div>
+      <form onSubmit={send} className="buzz-input">
+        <input value={input} onChange={e => setInput(e.target.value)}
+               placeholder="Ask Buzz anything…" disabled={busy} />
+        <button disabled={busy || !input.trim()}>Send</button>
+      </form>
+    </div>
+  )
+}

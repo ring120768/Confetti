@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { PHASES, currentPhase, groupByPhase, phaseProgress, dueDate, isOverdue, formatDue } from '../lib/engine.js'
+import Buzz from './Buzz.jsx'
 
 // The journey ribbon + current-phase task list.
 export default function Plan({ wedding }) {
@@ -71,6 +72,8 @@ export default function Plan({ wedding }) {
           </div>
         ))}
       </div>
+
+      <Buzz wedding={wedding} />
     </div>
   )
 }
