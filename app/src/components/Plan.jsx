@@ -54,7 +54,7 @@ export default function Plan({ wedding }) {
   return (
     <div>
       <header className="plan-header">
-        <img src="/confetti-logo.png" alt="Confetti" className="logo-small" />
+        <img src="/heart.png" alt="Wedding Planner Pro" className="logo-small" />
         <h1>Your wedding plan</h1>
       </header>
       {daysToGo !== null && <p className="tagline">{daysToGo} days to go 💛</p>}

@@ -38,7 +38,9 @@ export default function App() {
 
   if (!session) return (
     <div className="welcome">
-      <img src="/confetti-logo.png" alt="Confetti — where every detail sparkles" className="logo-hero" />
+      <img src="/heart.png" alt="" className="logo-hero" />
+      <h1>Wedding Planner Pro</h1>
+      <p className="tagline">Where every detail sparkles</p>
       <div className="card">
         {sent ? (
           <p><img src="/buzz.png" alt="" className="buzz-inline" /> Check your email — Buzz has sent you a sign-in link. 💌</p>

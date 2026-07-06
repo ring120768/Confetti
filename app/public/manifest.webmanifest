@@ -1,7 +1,7 @@
 {
-  "name": "Confetti — Your AI Wedding Planner",
-  "short_name": "Confetti",
-  "description": "Where every detail sparkles",
+  "name": "Wedding Planner Pro",
+  "short_name": "Planner Pro",
+  "description": "Buzz, your AI wedding planner — where every detail sparkles",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FAF6EE",

@@ -33,7 +33,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: url('/confetti-logo.png') no-repeat center / min(85vw, 480px);
+  background: url('/heart.png') no-repeat center / min(85vw, 480px);
   opacity: 0.25;
   pointer-events: none;
   z-index: 0;

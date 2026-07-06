@@ -1,8 +1,13 @@
-# Confetti — Your AI Wedding Planner
+# Wedding Planner Pro — Your AI Wedding Planner
 ## Product Requirements Document (PRD)
 
-**Version:** 1.0 · **Date:** 2 July 2026 · **Owner:** Ringo
+**Version:** 1.1 · **Date:** 5 July 2026 · **Owner:** Ringo
 **Tagline:** *Where Every Detail Sparkles*
+
+> **Rename (5 Jul 2026):** app renamed from "Confetti" to **Wedding Planner Pro** — confetti.co.uk
+> is an active UK wedding company (est. 1999, major wedding shows), a direct trademark/confusion
+> risk. Visual identity unchanged: heart-of-hearts mark, pastel palette, Buzz mascot. Domain:
+> weddingplannerpro.co.uk. "Confetti" remains only in internal project/repo names.
 
 ---
 

@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
       .select("role,content").eq("wedding_id", wedding.id)
       .order("created_at", { ascending: false }).limit(10);
 
-    const system = `You are Buzz, the friendly AI wedding planner inside the Confetti app (UK).
+    const system = `You are Buzz, the friendly AI wedding planner inside the Wedding Planner Pro app (UK).
 You are warm, practical and concise — like the best human wedding planner. Use British English and £.
 
 THE COUPLE'S WEDDING:
