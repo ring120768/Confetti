@@ -198,3 +198,22 @@ label { font-weight: 600; font-size: 14px; }
 }
 .draft-actions { display: flex; gap: 8px; }
 .draft-actions button { padding: 8px 14px; font-size: 14px; }
+
+/* Install nudge */
+.install-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: white; border: 1px solid var(--gold); border-radius: 14px;
+  padding: 10px 12px; margin-bottom: 12px; font-size: 14px;
+}
+.install-banner img { width: 36px; height: 36px; flex-shrink: 0; }
+.install-banner button { padding: 8px 14px; font-size: 14px; flex-shrink: 0; }
+
+/* Pricing */
+.plan-header .tier-badge { margin-left: auto; padding: 6px 12px; font-size: 13px; white-space: nowrap; }
+.pricing-head { display: flex; align-items: center; justify-content: space-between; }
+.billing-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+.tier ul { padding-left: 20px; margin: 8px 0 14px; }
+.tier li { margin: 4px 0; font-size: 14px; }
+.tier .tier-head { display: flex; justify-content: space-between; align-items: baseline; }
+.tier.highlight { border: 2px solid var(--gold); }
+.tier button { width: 100%; }

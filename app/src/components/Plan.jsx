@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { PHASES, currentPhase, groupByPhase, phaseProgress, dueDate, isOverdue, formatDue } from '../lib/engine.js'
 import Buzz from './Buzz.jsx'
+import Pricing from './Pricing.jsx'
 
 // A little confetti burst from the ticked checkbox — brand moment.
 const CONFETTI = ['#F7D6B8', '#F4C9C5', '#F5E6A8', '#C9DCEA', '#C8E0CC', '#D6CCE4', '#D49A2E']
@@ -27,13 +28,17 @@ export default function Plan({ wedding }) {
   const [tasks, setTasks] = useState([])
   const [library, setLibrary] = useState({})   // id -> library row
   const [selected, setSelected] = useState(null) // phase key; null = auto (current)
+  const [tier, setTier] = useState('free')
+  const [showPricing, setShowPricing] = useState(false)
 
   useEffect(() => {
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id)
       .then(({ data }) => setTasks(data || []))
     supabase.from('task_library').select('id,phase,priority,guidance,typical_cost_gbp')
       .then(({ data }) => setLibrary(Object.fromEntries((data || []).map(r => [r.id, r]))))
-  }, [wedding.id])
+    supabase.from('subscriptions').select('tier').eq('couple_id', wedding.couple_id).maybeSingle()
+      .then(({ data }) => setTier(data?.tier || 'free'))
+  }, [wedding.id, wedding.couple_id])
 
   const current = useMemo(() => currentPhase(tasks, library), [tasks, library])
   const groups = useMemo(() => groupByPhase(tasks, library), [tasks, library])
@@ -51,11 +56,16 @@ export default function Plan({ wedding }) {
     ? Math.ceil((new Date(wedding.wedding_date) - new Date()) / 86400000)
     : null
 
+  if (showPricing) return <Pricing currentTier={tier} onClose={() => setShowPricing(false)} />
+
   return (
     <div>
       <header className="plan-header">
         <img src="/heart.png" alt="Wedding Planner Pro" className="logo-small" />
         <h1>Your wedding plan</h1>
+        <button className="secondary tier-badge" onClick={() => setShowPricing(true)}>
+          {tier === 'free' ? 'Free · Upgrade ✨' : tier === 'sparkle' ? 'Sparkle ✨' : 'Luxe 👑'}
+        </button>
       </header>
       {daysToGo !== null && <p className="tagline">{daysToGo} days to go 💛</p>}
 

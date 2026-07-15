@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase.js'
 import Onboarding from './components/Onboarding.jsx'
 import Plan from './components/Plan.jsx'
+import InstallPrompt from './components/InstallPrompt.jsx'
 
 // Screens: loading -> signin -> onboarding (no wedding yet) -> plan
 export default function App() {
@@ -57,5 +58,10 @@ export default function App() {
 
   if (!wedding) return <Onboarding onCreated={setWedding} />
 
-  return <Plan wedding={wedding} onWeddingChange={setWedding} />
+  return (
+    <>
+      <InstallPrompt />
+      <Plan wedding={wedding} onWeddingChange={setWedding} />
+    </>
+  )
 }

@@ -94,10 +94,17 @@ export default function Buzz({ wedding }) {
         // supabase-js wraps non-2xx; try to read our error body
         let detail = 'Buzz is having a moment — try again shortly.'
         try {
-          const body = await error.context?.json()
-          if (body?.error === 'quota') detail = body.detail + ' Upgrade for more. ✨'
-          else if (body?.error) detail = body.error
-        } catch { /* keep default */ }
+          const raw = await error.context?.text()
+          try {
+            const body = JSON.parse(raw)
+            if (body?.error === 'quota') detail = body.detail + ' Upgrade for more. ✨'
+            else if (body?.error) detail = body.error
+          } catch {
+            // non-JSON response (function crashed) — show what came back
+            if (raw) detail = `Server error: ${raw.slice(0, 200)}`
+            else detail = `Request failed: ${error.message || 'no response'}`
+          }
+        } catch { detail = `Request failed: ${error.message || 'unknown'}` }
         setMessages(m => [...m, { role: 'assistant', content: detail }])
       } else {
         setMessages(m => [...m, { role: 'assistant', content: data.reply }])

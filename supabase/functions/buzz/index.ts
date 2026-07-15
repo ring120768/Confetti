@@ -149,8 +149,10 @@ RULES:
         body: JSON.stringify({ model: MODEL, max_tokens: 1200, system, messages, tools }),
       });
       if (!resp.ok) {
-        console.error("Anthropic error", resp.status, await resp.text());
-        return json({ error: "Buzz is having a moment — try again shortly." }, 502, cors);
+        const errText = await resp.text();
+        console.error("Anthropic error", resp.status, errText);
+        // TEMP DIAGNOSTIC: surface the real reason in the chat bubble
+        return json({ error: `Buzz API error ${resp.status}: ${errText.slice(0, 200)}` }, 502, cors);
       }
       data = await resp.json();
       if (data.stop_reason !== "tool_use") break;
