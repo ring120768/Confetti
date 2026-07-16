@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return json({ error: "Not signed in" }, 401, cors);
 
-    const { message } = await req.json();
+    const { message, task_id } = await req.json();
     if (!message || message.length > 2000) return json({ error: "Message missing or too long" }, 400, cors);
 
     // ---- context: wedding, tier, quota ----
@@ -74,6 +74,35 @@ Deno.serve(async (req) => {
     const budgetSpent = (budgetItems ?? []).reduce((a, b) => a + Number(b.paid ?? 0), 0);
     const budgetCommitted = (budgetItems ?? []).reduce((a, b) => a + Number(b.quoted ?? b.estimated ?? 0), 0);
 
+    // ---- focused task context ("Ask Buzz" on a specific task) ----
+    let focusBlock = "";
+    if (task_id) {
+      const { data: ft } = await supabase.from("tasks")
+        .select("*").eq("id", task_id).eq("wedding_id", wedding.id).maybeSingle();
+      if (ft) {
+        const { data: lib } = ft.library_id
+          ? await supabase.from("task_library").select("*").eq("id", ft.library_id).maybeSingle()
+          : { data: null };
+        let depsLine = "";
+        if (lib?.depends_on?.length) {
+          const { data: deps } = await supabase.from("tasks")
+            .select("title,status").eq("wedding_id", wedding.id).in("library_id", lib.depends_on);
+          depsLine = (deps ?? []).map(d => `${d.title} (${d.status})`).join("; ");
+        }
+        focusBlock = `
+THE COUPLE IS ASKING ABOUT THIS SPECIFIC TASK:
+- Task: ${ft.title} (status: ${ft.status}, due: ${ft.pinned_date || ft.computed_date || "no date"})
+- Priority: ${lib?.priority ?? "custom task"} · Category: ${ft.category}
+- Guidance notes: ${lib?.guidance ?? "none"}
+- Typical UK cost: ${lib?.typical_cost_gbp ?? "n/a"}
+- Questions a pro would ask suppliers: ${lib?.ask_suppliers?.length ? JSON.stringify(lib.ask_suppliers) : "n/a"}
+- Prerequisite tasks: ${depsLine || "none"}
+Anchor your answer to THIS task and their situation: reference its due date relative to their
+wedding date, whether prerequisites are done, their budget/guest numbers where relevant, and
+give concrete next steps for it. Offer research or an enquiry draft if that's the natural next move.`;
+      }
+    }
+
     // ---- recent conversation (short memory) ----
     const { data: history } = await supabase.from("ai_messages")
       .select("role,content").eq("wedding_id", wedding.id)
@@ -93,6 +122,7 @@ PLAN STATUS: ${open.length} tasks open, ${overdue.length} overdue.
 ${overdue.length ? "Overdue: " + overdue.slice(0, 5).map(t => t.title).join("; ") : ""}
 Next up: ${next.map(t => `${t.title} (due ${due(t)})`).join("; ") || "nothing scheduled"}
 
+${focusBlock}
 SUPPLIERS: ${supplierLines || "none saved yet"}
 GUESTS: ${guestTotal ? `${guestTotal} on the list, ${guestYes ?? 0} confirmed yes` : "no guest list yet"}
 BUDGET TRACKING: ${budgetItems?.length ? `£${budgetSpent} paid, ~£${budgetCommitted} committed across ${budgetItems.length} items` : "no budget items logged yet"}

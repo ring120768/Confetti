@@ -101,7 +101,10 @@ export default function Plan({ wedding }) {
               )}
               {t.status !== 'done' && t.status !== 'skipped' && (
                 <button type="button" className="ask-buzz"
-                        onClick={() => setBuzzAsk(`About "${t.title}" — where do we start, and what should we watch out for?`)}>
+                        onClick={() => setBuzzAsk({
+                          text: `About "${t.title}" — where do we start, and what should we watch out for?`,
+                          taskId: t.id,
+                        })}>
                   🐝 Ask Buzz
                 </button>
               )}

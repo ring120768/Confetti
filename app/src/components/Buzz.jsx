@@ -73,11 +73,15 @@ export default function Buzz({ wedding, ask, onAskConsumed }) {
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
 
-  // "Ask Buzz" from a task: open the panel with the question ready to send
+  const [focusTaskId, setFocusTaskId] = useState(null)
+
+  // "Ask Buzz" from a task: open the panel with the question ready to send,
+  // carrying the task id so the server can load that task's full context.
   useEffect(() => {
     if (!ask) return
     setOpen(true)
-    setInput(ask)
+    setInput(ask.text)
+    setFocusTaskId(ask.taskId || null)
     onAskConsumed?.()
     setTimeout(() => inputRef.current?.focus(), 50)
   }, [ask])
@@ -99,7 +103,10 @@ export default function Buzz({ wedding, ask, onAskConsumed }) {
     setMessages(m => [...m, { role: 'user', content: text }])
     setBusy(true)
     try {
-      const { data, error } = await supabase.functions.invoke('buzz', { body: { message: text } })
+      const { data, error } = await supabase.functions.invoke('buzz', {
+        body: { message: text, task_id: focusTaskId },
+      })
+      setFocusTaskId(null) // task focus applies to the message it came with
       if (error) {
         // supabase-js wraps non-2xx; try to read our error body
         let detail = 'Buzz is having a moment — try again shortly.'
