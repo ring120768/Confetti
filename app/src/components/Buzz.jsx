@@ -64,13 +64,23 @@ function EmailDraft({ draft }) {
 }
 
 // Buzz chat: floating button -> slide-up panel.
-export default function Buzz({ wedding }) {
+export default function Buzz({ wedding, ask, onAskConsumed }) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [quota, setQuota] = useState(null) // { used, quota }
   const bottomRef = useRef(null)
+  const inputRef = useRef(null)
+
+  // "Ask Buzz" from a task: open the panel with the question ready to send
+  useEffect(() => {
+    if (!ask) return
+    setOpen(true)
+    setInput(ask)
+    onAskConsumed?.()
+    setTimeout(() => inputRef.current?.focus(), 50)
+  }, [ask])
 
   useEffect(() => {
     if (!open) return
@@ -139,7 +149,7 @@ export default function Buzz({ wedding }) {
         <div ref={bottomRef} />
       </div>
       <form onSubmit={send} className="buzz-input">
-        <input value={input} onChange={e => setInput(e.target.value)}
+        <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
                placeholder="Ask Buzz anything…" disabled={busy} />
         <button disabled={busy || !input.trim()}>Send</button>
       </form>

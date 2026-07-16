@@ -30,6 +30,7 @@ export default function Plan({ wedding }) {
   const [selected, setSelected] = useState(null) // phase key; null = auto (current)
   const [tier, setTier] = useState('free')
   const [showPricing, setShowPricing] = useState(false)
+  const [buzzAsk, setBuzzAsk] = useState(null)
 
   useEffect(() => {
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id)
@@ -98,12 +99,18 @@ export default function Plan({ wedding }) {
               {library[t.library_id]?.guidance && t.status !== 'done' && (
                 <div className="meta">{library[t.library_id].guidance}</div>
               )}
+              {t.status !== 'done' && t.status !== 'skipped' && (
+                <button type="button" className="ask-buzz"
+                        onClick={() => setBuzzAsk(`About "${t.title}" — where do we start, and what should we watch out for?`)}>
+                  🐝 Ask Buzz
+                </button>
+              )}
             </div>
           </div>
         ))}
       </div>
 
-      <Buzz wedding={wedding} />
+      <Buzz wedding={wedding} ask={buzzAsk} onAskConsumed={() => setBuzzAsk(null)} />
     </div>
   )
 }

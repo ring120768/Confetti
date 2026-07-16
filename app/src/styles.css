@@ -199,6 +199,13 @@ label { font-weight: 600; font-size: 14px; }
 .draft-actions { display: flex; gap: 8px; }
 .draft-actions button { padding: 8px 14px; font-size: 14px; }
 
+.ask-buzz {
+  background: var(--ivory); color: var(--ink);
+  font-size: 13px; padding: 5px 12px; margin-top: 6px;
+  border: 1px solid var(--sand); border-radius: 999px;
+}
+.ask-buzz:hover { border-color: var(--gold); }
+
 /* Install nudge */
 .install-banner {
   display: flex; align-items: center; gap: 10px;
