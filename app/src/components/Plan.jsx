@@ -44,6 +44,11 @@ export default function Plan({ wedding }) {
   const current = useMemo(() => currentPhase(tasks, library), [tasks, library])
   const groups = useMemo(() => groupByPhase(tasks, library), [tasks, library])
   const shown = selected || current
+  const [showOverdue, setShowOverdue] = useState(false)
+  const overdueTasks = useMemo(
+    () => tasks.filter(isOverdue).sort((a, b) => (dueDate(a) < dueDate(b) ? -1 : 1)),
+    [tasks]
+  )
 
   async function toggle(task, e) {
     const status = task.status === 'done' ? 'todo' : 'done'
@@ -52,6 +57,34 @@ export default function Plan({ wedding }) {
     const { error } = await supabase.from('tasks').update({ status }).eq('id', task.id)
     if (error) setTasks(ts => ts.map(t => t.id === task.id ? { ...t, status: task.status } : t))
   }
+
+  const renderTask = (t) => (
+    <div key={t.id} className={'task' + (t.status === 'done' ? ' done' : '')}>
+      <input type="checkbox" checked={t.status === 'done'} onChange={(e) => toggle(t, e)} />
+      <div>
+        <div className="title">{t.title}</div>
+        <div className="meta">
+          <span className={'due' + (isOverdue(t) ? ' overdue' : '')}>{formatDue(dueDate(t))}</span>
+          {' · '}
+          <span className={'badge ' + (library[t.library_id]?.priority || '')}>
+            {library[t.library_id]?.priority || 'custom'}
+          </span>
+        </div>
+        {library[t.library_id]?.guidance && t.status !== 'done' && (
+          <div className="meta">{library[t.library_id].guidance}</div>
+        )}
+        {t.status !== 'done' && t.status !== 'skipped' && (
+          <button type="button" className="ask-buzz"
+                  onClick={() => setBuzzAsk({
+                    text: `About "${t.title}" — where do we start, and what should we watch out for?`,
+                    taskId: t.id,
+                  })}>
+            🐝 Ask Buzz
+          </button>
+        )}
+      </div>
+    </div>
+  )
 
   const daysToGo = wedding.wedding_date
     ? Math.ceil((new Date(wedding.wedding_date) - new Date()) / 86400000)
@@ -70,6 +103,13 @@ export default function Plan({ wedding }) {
       </header>
       {daysToGo !== null && <p className="tagline">{daysToGo} days to go 💛</p>}
 
+      {overdueTasks.length > 0 && (
+        <button type="button" className={'overdue-chip' + (showOverdue ? ' active' : '')}
+                onClick={() => setShowOverdue(v => !v)}>
+          🕰 {overdueTasks.length} {overdueTasks.length === 1 ? 'task needs' : 'tasks need'} catching up
+        </button>
+      )}
+
       <div className="ribbon">
         {PHASES.map(p => (
           <div key={p.key}
@@ -81,36 +121,18 @@ export default function Plan({ wedding }) {
         ))}
       </div>
 
+      {showOverdue && overdueTasks.length > 0 && (
+        <div className="card overdue-card">
+          <h3>Catching up 🕰</h3>
+          <p className="meta">No panic — most couples have a few of these. Knock off one or two, or ask Buzz where to start.</p>
+          {overdueTasks.map(t => renderTask(t))}
+        </div>
+      )}
+
       <div className="card">
         <h3>{PHASES.find(p => p.key === shown)?.label}</h3>
         {groups[shown]?.length === 0 && <p>Nothing in this phase — enjoy the calm!</p>}
-        {groups[shown]?.map(t => (
-          <div key={t.id} className={'task' + (t.status === 'done' ? ' done' : '')}>
-            <input type="checkbox" checked={t.status === 'done'} onChange={(e) => toggle(t, e)} />
-            <div>
-              <div className="title">{t.title}</div>
-              <div className="meta">
-                <span className={'due' + (isOverdue(t) ? ' overdue' : '')}>{formatDue(dueDate(t))}</span>
-                {' · '}
-                <span className={'badge ' + (library[t.library_id]?.priority || '')}>
-                  {library[t.library_id]?.priority || 'custom'}
-                </span>
-              </div>
-              {library[t.library_id]?.guidance && t.status !== 'done' && (
-                <div className="meta">{library[t.library_id].guidance}</div>
-              )}
-              {t.status !== 'done' && t.status !== 'skipped' && (
-                <button type="button" className="ask-buzz"
-                        onClick={() => setBuzzAsk({
-                          text: `About "${t.title}" — where do we start, and what should we watch out for?`,
-                          taskId: t.id,
-                        })}>
-                  🐝 Ask Buzz
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
+        {groups[shown]?.map(t => renderTask(t))}
       </div>
 
       <Buzz wedding={wedding} ask={buzzAsk} onAskConsumed={() => setBuzzAsk(null)} />

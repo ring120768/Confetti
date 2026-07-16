@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 
+// Turn bare URLs in Buzz's text into safe, tappable links.
+function Linkified({ text }) {
+  const parts = text.split(/(https?:\/\/[^\s)\]}"']+)/g)
+  return parts.map((p, i) =>
+    i % 2 === 1
+      ? <a key={i} href={p} target="_blank" rel="noopener noreferrer">{p.replace(/^https?:\/\/(www\.)?/, '').slice(0, 50)}</a>
+      : <span key={i}>{p}</span>
+  )
+}
+
 // Renders a chat message WhatsApp-style: Buzz's avatar sits beside her
 // bubbles; ```email blocks become a draft card with Copy / mailto actions.
 function Message({ role, content, time }) {
@@ -9,7 +19,7 @@ function Message({ role, content, time }) {
     <div className={'bubble ' + role}>
       {parts.map((part, i) =>
         i % 2 === 0
-          ? (part.trim() ? <span key={i}>{part}</span> : null)
+          ? (part.trim() ? <Linkified key={i} text={part} /> : null)
           : <EmailDraft key={i} draft={part.trim()} />
       )}
       {time && <span className="stamp">{time}</span>}
@@ -109,19 +119,16 @@ export default function Buzz({ wedding, ask, onAskConsumed }) {
       setFocusTaskId(null) // task focus applies to the message it came with
       if (error) {
         // supabase-js wraps non-2xx; try to read our error body
-        let detail = 'Buzz is having a moment — try again shortly.'
+        let detail = 'Buzz is having a moment — give her a minute and try again. 🐝'
         try {
           const raw = await error.context?.text()
+          console.error('Buzz request failed:', error.message, raw) // detail for devs, not couples
           try {
             const body = JSON.parse(raw)
             if (body?.error === 'quota') detail = body.detail + ' Upgrade for more. ✨'
             else if (body?.error) detail = body.error
-          } catch {
-            // non-JSON response (function crashed) — show what came back
-            if (raw) detail = `Server error: ${raw.slice(0, 200)}`
-            else detail = `Request failed: ${error.message || 'no response'}`
-          }
-        } catch { detail = `Request failed: ${error.message || 'unknown'}` }
+          } catch { /* keep friendly default */ }
+        } catch { console.error('Buzz request failed:', error?.message) }
         setMessages(m => [...m, { role: 'assistant', content: detail }])
       } else {
         setMessages(m => [...m, { role: 'assistant', content: data.reply }])

@@ -11,6 +11,13 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const t = setTimeout(() => setCooldown(c => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [cooldown])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
@@ -30,9 +37,10 @@ export default function App() {
   }, [session])
 
   async function signIn(e) {
-    e.preventDefault()
+    e?.preventDefault()
     await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } })
     setSent(true)
+    setCooldown(60)
   }
 
   if (loading) return <p>Loading…</p>
@@ -44,7 +52,18 @@ export default function App() {
       <p className="tagline">Where every detail sparkles</p>
       <div className="card">
         {sent ? (
-          <p><img src="/buzz.png" alt="" className="buzz-inline" /> Check your email — Buzz has sent you a sign-in link. 💌</p>
+          <div>
+            <p><img src="/buzz.png" alt="" className="buzz-inline" /> Buzz has sent a sign-in link to <strong>{email}</strong> 💌</p>
+            <p className="meta">It can take a minute or two — and do check your spam folder the first time.</p>
+            <div className="draft-actions">
+              <button type="button" className="secondary" disabled={cooldown > 0} onClick={() => signIn()}>
+                {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend link'}
+              </button>
+              <button type="button" className="secondary" onClick={() => { setSent(false); setCooldown(0) }}>
+                Use a different email
+              </button>
+            </div>
+          </div>
         ) : (
           <form onSubmit={signIn}>
             <label>Your email</label>
@@ -62,6 +81,12 @@ export default function App() {
     <>
       <InstallPrompt />
       <Plan wedding={wedding} onWeddingChange={setWedding} />
+      <footer className="account-footer">
+        Signed in as {session.user.email} ·{' '}
+        <a href="#" onClick={async (e) => { e.preventDefault(); await supabase.auth.signOut(); setWedding(null) }}>
+          Sign out
+        </a>
+      </footer>
     </>
   )
 }
