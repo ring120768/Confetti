@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase.js'
 import { PHASES, currentPhase, groupByPhase, phaseProgress, dueDate, isOverdue, formatDue } from '../lib/engine.js'
 import Buzz from './Buzz.jsx'
 import Pricing from './Pricing.jsx'
+import TaskSheet from './TaskSheet.jsx'
+import EditWedding from './EditWedding.jsx'
 
 // A little confetti burst from the ticked checkbox — brand moment.
 const CONFETTI = ['#F7D6B8', '#F4C9C5', '#F5E6A8', '#C9DCEA', '#C8E0CC', '#D6CCE4', '#D49A2E']
@@ -24,18 +26,23 @@ function confettiBurst(el) {
 }
 
 // The journey ribbon + current-phase task list.
-export default function Plan({ wedding }) {
+export default function Plan({ wedding, onWeddingChange }) {
   const [tasks, setTasks] = useState([])
   const [library, setLibrary] = useState({})   // id -> library row
   const [selected, setSelected] = useState(null) // phase key; null = auto (current)
   const [tier, setTier] = useState('free')
   const [showPricing, setShowPricing] = useState(false)
   const [buzzAsk, setBuzzAsk] = useState(null)
+  const [sheetTask, setSheetTask] = useState(null)
+  const [showEdit, setShowEdit] = useState(false)
 
-  useEffect(() => {
+  const loadTasks = () =>
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id)
       .then(({ data }) => setTasks(data || []))
-    supabase.from('task_library').select('id,phase,priority,guidance,typical_cost_gbp')
+
+  useEffect(() => {
+    loadTasks()
+    supabase.from('task_library').select('id,phase,priority,guidance,typical_cost_gbp,ask_suppliers')
       .then(({ data }) => setLibrary(Object.fromEntries((data || []).map(r => [r.id, r]))))
     supabase.from('subscriptions').select('tier').eq('couple_id', wedding.couple_id).maybeSingle()
       .then(({ data }) => setTier(data?.tier || 'free'))
@@ -49,6 +56,15 @@ export default function Plan({ wedding }) {
     () => tasks.filter(isOverdue).sort((a, b) => (dueDate(a) < dueDate(b) ? -1 : 1)),
     [tasks]
   )
+  const thisWeek = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    const weekOut = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
+    return tasks
+      .filter(t => t.status !== 'done' && t.status !== 'skipped')
+      .filter(t => { const d = dueDate(t); return d && d >= today && d <= weekOut })
+      .sort((a, b) => (dueDate(a) < dueDate(b) ? -1 : 1))
+      .slice(0, 5)
+  }, [tasks])
 
   async function toggle(task, e) {
     const status = task.status === 'done' ? 'todo' : 'done'
@@ -59,10 +75,14 @@ export default function Plan({ wedding }) {
   }
 
   const renderTask = (t) => (
-    <div key={t.id} className={'task' + (t.status === 'done' ? ' done' : '')}>
+    <div key={t.id} className={'task' + (t.status === 'done' ? ' done' : '') + (t.status === 'skipped' ? ' skipped' : '')}>
       <input type="checkbox" checked={t.status === 'done'} onChange={(e) => toggle(t, e)} />
       <div>
-        <div className="title">{t.title}</div>
+        <div className="title" role="button" tabIndex={0}
+             onClick={() => setSheetTask(t)}
+             onKeyDown={(e) => e.key === 'Enter' && setSheetTask(t)}>
+          {t.title}{t.status === 'skipped' && <span className="badge"> skipped</span>}
+        </div>
         <div className="meta">
           <span className={'due' + (isOverdue(t) ? ' overdue' : '')}>{formatDue(dueDate(t))}</span>
           {' · '}
@@ -101,7 +121,24 @@ export default function Plan({ wedding }) {
           {tier === 'free' ? 'Free · Upgrade ✨' : tier === 'sparkle' ? 'Sparkle ✨' : 'Luxe 👑'}
         </button>
       </header>
-      {daysToGo !== null && <p className="tagline">{daysToGo} days to go 💛</p>}
+      {daysToGo !== null && (
+        <p className="tagline">
+          {daysToGo} days to go 💛{' '}
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowEdit(true) }}>edit details</a>
+        </p>
+      )}
+      {daysToGo === null && (
+        <p className="tagline">
+          No date yet — <a href="#" onClick={(e) => { e.preventDefault(); setShowEdit(true) }}>set one</a> and your plan gets real dates ✨
+        </p>
+      )}
+
+      <div className="card this-week">
+        <h3>This week 🗓</h3>
+        {thisWeek.length === 0
+          ? <p className="meta">Nothing due this week — you're ahead of the game. Enjoy being engaged! 💛</p>
+          : thisWeek.map(t => renderTask(t))}
+      </div>
 
       {overdueTasks.length > 0 && (
         <button type="button" className={'overdue-chip' + (showOverdue ? ' active' : '')}
@@ -134,6 +171,31 @@ export default function Plan({ wedding }) {
         {groups[shown]?.length === 0 && <p>Nothing in this phase — enjoy the calm!</p>}
         {groups[shown]?.map(t => renderTask(t))}
       </div>
+
+      {sheetTask && (
+        <TaskSheet
+          task={sheetTask}
+          lib={library[sheetTask.library_id]}
+          onClose={() => setSheetTask(null)}
+          onPatched={(updated) => {
+            setTasks(ts => ts.map(x => x.id === updated.id ? updated : x))
+            setSheetTask(updated)
+          }}
+          onAskBuzz={setBuzzAsk}
+        />
+      )}
+
+      {showEdit && (
+        <EditWedding
+          wedding={wedding}
+          onClose={() => setShowEdit(false)}
+          onSaved={(updated) => {
+            setShowEdit(false)
+            onWeddingChange?.(updated)
+            loadTasks()
+          }}
+        />
+      )}
 
       <Buzz wedding={wedding} ask={buzzAsk} onAskConsumed={() => setBuzzAsk(null)} />
     </div>

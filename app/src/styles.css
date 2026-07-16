@@ -138,6 +138,38 @@ label { font-weight: 600; font-size: 14px; }
   font-size: 13px; color: var(--muted); text-align: center;
 }
 .account-footer a { color: var(--teal); }
+.tagline a { color: var(--teal); font-size: 13px; }
+
+/* This Week */
+.this-week { border: 2px solid var(--teal); }
+.task .title[role="button"] { cursor: pointer; }
+.task .title[role="button"]:hover { color: var(--teal); }
+.task.skipped { opacity: 0.55; }
+.task.skipped .title { text-decoration: line-through; }
+
+/* Bottom sheet */
+.sheet-overlay {
+  position: fixed; inset: 0; background: rgba(61, 54, 46, 0.4);
+  display: flex; align-items: flex-end; justify-content: center; z-index: 60;
+}
+.sheet {
+  background: var(--cream); border-radius: 20px 20px 0 0;
+  width: 100%; max-width: 560px; max-height: 85dvh; overflow-y: auto;
+  padding: 12px 20px 28px;
+  animation: sheet-up 0.22s ease-out;
+}
+@keyframes sheet-up { from { transform: translateY(40px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+.sheet-handle { width: 44px; height: 4px; border-radius: 2px; background: var(--stone); margin: 4px auto 12px; }
+.sheet h4 { margin: 16px 0 6px; }
+.sheet ul { margin: 0; padding-left: 20px; }
+.sheet li { margin: 4px 0; font-size: 14px; }
+.sheet textarea {
+  font: inherit; width: 100%; padding: 12px; border: 1px solid var(--stone);
+  border-radius: 12px; background: white; margin: 6px 0;
+}
+.sheet-row { display: flex; gap: 8px; align-items: center; }
+.sheet-row input { margin: 0; flex: 1; }
+.sheet-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
 .bubble.assistant a, .meta a { color: var(--teal); word-break: break-all; }
 
 /* Brand imagery */
