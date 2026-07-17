@@ -222,6 +222,44 @@ label { font-weight: 600; font-size: 14px; }
 .sheet-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
 .bubble.assistant a, .meta a { color: var(--teal); word-break: break-all; }
 
+/* Landing page */
+.landing { padding-bottom: 24px; }
+.landing-nav {
+  display: flex; align-items: center; gap: 10px; padding: 8px 0 4px;
+}
+.landing-nav img { width: 36px; height: 36px; }
+.landing-nav button { margin-left: auto; padding: 8px 16px; font-size: 14px; }
+.hero { text-align: center; padding: 24px 0 8px; }
+.hero h1 { font-size: 34px; line-height: 1.15; margin: 8px 0 12px; }
+.hero .sub { font-size: 16px; color: var(--muted); margin-bottom: 20px; }
+.signin-form { display: flex; flex-direction: column; gap: 10px; max-width: 380px; margin: 0 auto; }
+.signin-form input { margin: 0; text-align: center; }
+.signin-form .meta { margin: 0; }
+.signin-card { max-width: 420px; margin: 0 auto; text-align: left; }
+.features { display: flex; flex-direction: column; gap: 4px; margin-top: 24px; }
+.feature { text-align: left; }
+.feature-icon { font-size: 30px; }
+.feature h3 { margin: 6px 0; }
+.feature p { font-size: 15px; color: var(--muted); margin: 0; }
+.steps { margin: 28px 0 8px; }
+.steps h2, .landing-pricing h2 { text-align: center; }
+.step { display: flex; gap: 14px; align-items: flex-start; margin: 14px 0; }
+.step-n {
+  background: var(--rose); color: white; border-radius: 50%;
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; flex-shrink: 0;
+}
+.step .meta { margin: 2px 0 0; }
+.landing-pricing { margin-top: 24px; }
+.landing-pricing > .meta { text-align: center; margin-bottom: 14px; }
+.founding { text-align: center; border: 2px dashed var(--gold); margin-top: 20px; }
+.founding button { margin-top: 8px; }
+.landing-footer { text-align: center; margin-top: 28px; }
+
+@media (min-width: 560px) {
+  .hero h1 { font-size: 40px; }
+}
+
 /* Brand imagery */
 .welcome { text-align: center; padding-top: 24px; }
 .welcome .card { text-align: left; }
