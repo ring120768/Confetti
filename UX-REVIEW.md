@@ -4,6 +4,12 @@
 **Priorities:** P0 = fix before beta couples · P1 = fix before public launch · P2 = post-launch polish
 **Effort:** S = under an hour · M = a session · L = multi-session
 
+> **PROGRESS (updated 15 Jul 2026):** Batches 1–3 shipped — 17 of 30 done.
+> ✅ Done: 1.1, 1.2, 1.3 · 2.1, 2.2, 2.3, 2.4, 2.6 · 3.1, 3.2, 3.3, 3.5 · 4.2, 4.3 · 5.1, 5.2, 5.6 (focus rings)
+> ⬜ Remaining P0-for-launch: 6.1 guests, 6.2 budget
+> ⬜ Remaining P1: 1.4 settings/GDPR, 1.5 partner invite, 2.5 custom tasks, 2.8 ribbon, 3.4 panel expand, 4.1 Buzz-led onboarding, 4.4 Google sign-in, 5.4 contrast, 6.3 reminders
+> ⬜ Remaining P2: 2.7, 2.9, 5.3, 5.5, 6.4 (Luxe builds)
+
 ---
 
 ## 1. Dead ends & missing doors (navigation)

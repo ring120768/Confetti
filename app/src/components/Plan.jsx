@@ -6,6 +6,9 @@ import Pricing from './Pricing.jsx'
 import TaskSheet from './TaskSheet.jsx'
 import EditWedding from './EditWedding.jsx'
 import Suppliers from './Suppliers.jsx'
+import Guests from './Guests.jsx'
+import Budget from './Budget.jsx'
+import AddTask from './AddTask.jsx'
 
 // A little confetti burst from the ticked checkbox — brand moment.
 const CONFETTI = ['#F7D6B8', '#F4C9C5', '#F5E6A8', '#C9DCEA', '#C8E0CC', '#D6CCE4', '#D49A2E']
@@ -36,7 +39,8 @@ export default function Plan({ wedding, onWeddingChange }) {
   const [buzzAsk, setBuzzAsk] = useState(null)
   const [sheetTask, setSheetTask] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
-  const [view, setView] = useState('plan') // 'plan' | 'suppliers'
+  const [view, setView] = useState('plan') // plan | guests | budget | suppliers
+  const [showAddTask, setShowAddTask] = useState(false)
 
   const loadTasks = () =>
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id)
@@ -136,11 +140,14 @@ export default function Plan({ wedding, onWeddingChange }) {
       )}
 
       <nav className="view-tabs">
-        <button type="button" className={view === 'plan' ? 'active' : ''} onClick={() => setView('plan')}>Plan</button>
-        <button type="button" className={view === 'suppliers' ? 'active' : ''} onClick={() => setView('suppliers')}>Suppliers</button>
+        {[['plan', 'Plan'], ['guests', 'Guests'], ['budget', 'Budget'], ['suppliers', 'Suppliers']].map(([k, label]) => (
+          <button key={k} type="button" className={view === k ? 'active' : ''} onClick={() => setView(k)}>{label}</button>
+        ))}
       </nav>
 
       {view === 'suppliers' && <Suppliers wedding={wedding} onAskBuzz={setBuzzAsk} />}
+      {view === 'guests' && <Guests wedding={wedding} tier={tier} onUpgrade={() => setShowPricing(true)} />}
+      {view === 'budget' && <Budget wedding={wedding} onEditWedding={() => setShowEdit(true)} />}
 
       {view === 'plan' && <>
       <div className="card this-week">
@@ -177,11 +184,19 @@ export default function Plan({ wedding, onWeddingChange }) {
       )}
 
       <div className="card">
-        <h3>{PHASES.find(p => p.key === shown)?.label}</h3>
+        <div className="pricing-head">
+          <h3>{PHASES.find(p => p.key === shown)?.label}</h3>
+          <button type="button" className="secondary" onClick={() => setShowAddTask(true)}>+ Add task</button>
+        </div>
         {groups[shown]?.length === 0 && <p>Nothing in this phase — enjoy the calm!</p>}
         {groups[shown]?.map(t => renderTask(t))}
       </div>
       </>}
+
+      {showAddTask && (
+        <AddTask wedding={wedding} onClose={() => setShowAddTask(false)}
+                 onAdded={(t) => { setShowAddTask(false); setTasks(ts => [...ts, t]) }} />
+      )}
 
       {sheetTask && (
         <TaskSheet
