@@ -147,6 +147,37 @@ label { font-weight: 600; font-size: 14px; }
 .task.skipped { opacity: 0.55; }
 .task.skipped .title { text-decoration: line-through; }
 
+/* View tabs */
+.view-tabs { display: flex; gap: 8px; margin: 4px 0 12px; }
+.view-tabs button {
+  background: var(--ivory); color: var(--ink); padding: 8px 18px; border-radius: 999px; font-size: 14px;
+}
+.view-tabs button.active { background: var(--rose); color: white; }
+
+/* Suppliers */
+.supplier { padding: 12px 0; border-bottom: 1px solid var(--sand); }
+.supplier-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.stage-chip {
+  font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  background: var(--ivory); color: var(--ink);
+}
+.stage-chip.enquired { background: var(--sky); }
+.stage-chip.quoted { background: var(--lemon); }
+.stage-chip.booked { background: var(--mint); }
+.supplier-actions { display: flex; gap: 14px; margin-top: 6px; font-size: 14px; flex-wrap: wrap; }
+.supplier-actions a { color: var(--teal); text-decoration: none; }
+.supplier-actions a.danger { color: var(--rose); }
+
+/* Buzz starter chips */
+.starter-chips { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.starter-chips button { text-align: left; font-size: 14px; padding: 10px 14px; }
+
+/* Plan reveal */
+.sheet-overlay.reveal { align-items: center; padding: 24px; }
+.reveal-card { text-align: center; max-width: 400px; animation: sheet-up 0.3s ease-out; }
+.reveal-card .buzz { width: 100px; height: 100px; }
+.reveal-card button { width: 100%; margin-top: 8px; }
+
 /* Bottom sheet */
 .sheet-overlay {
   position: fixed; inset: 0; background: rgba(61, 54, 46, 0.4);

@@ -3,11 +3,13 @@ import { supabase } from './lib/supabase.js'
 import Onboarding from './components/Onboarding.jsx'
 import Plan from './components/Plan.jsx'
 import InstallPrompt from './components/InstallPrompt.jsx'
+import Reveal from './components/Reveal.jsx'
 
 // Screens: loading -> signin -> onboarding (no wedding yet) -> plan
 export default function App() {
   const [session, setSession] = useState(null)
   const [wedding, setWedding] = useState(null)
+  const [justCreated, setJustCreated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
@@ -75,10 +77,11 @@ export default function App() {
     </div>
   )
 
-  if (!wedding) return <Onboarding onCreated={setWedding} />
+  if (!wedding) return <Onboarding onCreated={(w) => { setWedding(w); setJustCreated(true) }} />
 
   return (
     <>
+      {justCreated && <Reveal wedding={wedding} onDone={() => setJustCreated(false)} />}
       <InstallPrompt />
       <Plan wedding={wedding} onWeddingChange={setWedding} />
       <footer className="account-footer">

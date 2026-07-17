@@ -5,6 +5,7 @@ import Buzz from './Buzz.jsx'
 import Pricing from './Pricing.jsx'
 import TaskSheet from './TaskSheet.jsx'
 import EditWedding from './EditWedding.jsx'
+import Suppliers from './Suppliers.jsx'
 
 // A little confetti burst from the ticked checkbox — brand moment.
 const CONFETTI = ['#F7D6B8', '#F4C9C5', '#F5E6A8', '#C9DCEA', '#C8E0CC', '#D6CCE4', '#D49A2E']
@@ -35,6 +36,7 @@ export default function Plan({ wedding, onWeddingChange }) {
   const [buzzAsk, setBuzzAsk] = useState(null)
   const [sheetTask, setSheetTask] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
+  const [view, setView] = useState('plan') // 'plan' | 'suppliers'
 
   const loadTasks = () =>
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id)
@@ -133,6 +135,14 @@ export default function Plan({ wedding, onWeddingChange }) {
         </p>
       )}
 
+      <nav className="view-tabs">
+        <button type="button" className={view === 'plan' ? 'active' : ''} onClick={() => setView('plan')}>Plan</button>
+        <button type="button" className={view === 'suppliers' ? 'active' : ''} onClick={() => setView('suppliers')}>Suppliers</button>
+      </nav>
+
+      {view === 'suppliers' && <Suppliers wedding={wedding} onAskBuzz={setBuzzAsk} />}
+
+      {view === 'plan' && <>
       <div className="card this-week">
         <h3>This week 🗓</h3>
         {thisWeek.length === 0
@@ -171,6 +181,7 @@ export default function Plan({ wedding, onWeddingChange }) {
         {groups[shown]?.length === 0 && <p>Nothing in this phase — enjoy the calm!</p>}
         {groups[shown]?.map(t => renderTask(t))}
       </div>
+      </>}
 
       {sheetTask && (
         <TaskSheet
@@ -197,7 +208,7 @@ export default function Plan({ wedding, onWeddingChange }) {
         />
       )}
 
-      <Buzz wedding={wedding} ask={buzzAsk} onAskConsumed={() => setBuzzAsk(null)} />
+      <Buzz wedding={wedding} tier={tier} ask={buzzAsk} onAskConsumed={() => setBuzzAsk(null)} />
     </div>
   )
 }

@@ -74,7 +74,14 @@ function EmailDraft({ draft }) {
 }
 
 // Buzz chat: floating button -> slide-up panel.
-export default function Buzz({ wedding, ask, onAskConsumed }) {
+const TIER_QUOTA = { free: 10, sparkle: 200, luxe: Infinity }
+const STARTERS = [
+  "What should we be doing this month?",
+  "Find wedding venues near us",
+  "How much should we budget for flowers?",
+]
+
+export default function Buzz({ wedding, tier = 'free', ask, onAskConsumed }) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -101,13 +108,20 @@ export default function Buzz({ wedding, ask, onAskConsumed }) {
     supabase.from('ai_messages').select('role,content,created_at')
       .eq('wedding_id', wedding.id).order('created_at').limit(50)
       .then(({ data }) => setMessages(data || []))
-  }, [open, wedding.id])
+    // used-this-month count so the free-tier limit is never a surprise
+    const monthStart = new Date(); monthStart.setUTCDate(1); monthStart.setUTCHours(0, 0, 0, 0)
+    supabase.from('ai_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('wedding_id', wedding.id).eq('role', 'user')
+      .gte('created_at', monthStart.toISOString())
+      .then(({ count }) => setQuota({ used: count ?? 0, quota: TIER_QUOTA[tier] ?? 10 }))
+  }, [open, wedding.id, tier])
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, open])
 
-  async function send(e) {
-    e.preventDefault()
-    const text = input.trim()
+  async function send(e, direct) {
+    e?.preventDefault()
+    const text = (direct ?? input).trim()
     if (!text || busy) return
     setInput('')
     setMessages(m => [...m, { role: 'user', content: text }])
@@ -150,13 +164,23 @@ export default function Buzz({ wedding, ask, onAskConsumed }) {
       <div className="buzz-head">
         <img src="/buzz.png" alt="" className="buzz-inline" />
         <strong>Buzz</strong>
-        {quota && <span className="badge">{quota.used}/{quota.quota} this month</span>}
+        {quota && quota.quota !== Infinity && (
+          <span className={'badge' + (quota.quota - quota.used <= 3 ? ' essential' : '')}>
+            {Math.max(quota.quota - quota.used, 0)} of {quota.quota} left this month
+          </span>
+        )}
         <button className="secondary" onClick={() => setOpen(false)}>Close</button>
       </div>
       <div className="buzz-thread">
         {messages.length === 0 && (
-          <p className="meta">Ask me anything — "what should we be doing this month?",
-          "how much do flowers cost?", "what do I ask a photographer?" 🐝</p>
+          <div>
+            <p className="meta">Hi! I'm Buzz, your wedding planner. Try one of these to get going 🐝</p>
+            <div className="starter-chips">
+              {STARTERS.map(s => (
+                <button key={s} type="button" className="secondary" onClick={(e) => send(e, s)}>{s}</button>
+              ))}
+            </div>
+          </div>
         )}
         {messages.map((m, i) => <Message key={i} role={m.role} content={m.content} time={stamp(m.created_at)} />)}
         {busy && <Typing />}
