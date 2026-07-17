@@ -13,7 +13,9 @@ const UK_SPLIT = [
 ]
 const gbp = (n) => '£' + Number(n || 0).toLocaleString('en-GB', { maximumFractionDigits: 0 })
 
-export default function Budget({ wedding, onEditWedding }) {
+const FREE_ITEM_CAP = 15
+
+export default function Budget({ wedding, tier = 'free', onEditWedding, onUpgrade }) {
   const [items, setItems] = useState([])
   const [editing, setEditing] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -65,7 +67,9 @@ export default function Budget({ wedding, onEditWedding }) {
       <div className="card">
         <div className="pricing-head">
           <h3>Budget</h3>
-          <button type="button" onClick={() => setEditing('new')}>+ Add</button>
+          {tier === 'free' && items.length >= FREE_ITEM_CAP
+            ? <button type="button" className="secondary" onClick={onUpgrade}>{FREE_ITEM_CAP} item limit · Upgrade ✨</button>
+            : <button type="button" onClick={() => setEditing('new')}>+ Add</button>}
         </div>
 
         <div className="budget-summary">

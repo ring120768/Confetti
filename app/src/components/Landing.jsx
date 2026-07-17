@@ -23,8 +23,8 @@ const STEPS = [
 ]
 
 const TIERS = [
-  { name: 'Free', price: '£0', per: 'forever', blurb: 'The best free wedding checklist in the UK.', features: ['Full task plan & timeline', 'Guest list (up to 50)', 'Budget totals', 'Buzz taster — 10 messages/mo'] },
-  { name: 'Sparkle', price: '£8.99', per: '/month · or £59/yr', blurb: 'Your planning co-pilot.', features: ['Unlimited guests & RSVP tracking', 'Full budget planner', 'Supplier pipeline', 'Buzz — 200 messages/mo'], highlight: true },
+  { name: 'Free', price: '£0', per: 'forever', blurb: 'The best free wedding checklist in the UK.', features: ['Full task plan & timeline', 'Guest list (up to 50)', 'Budget (15 items) & suppliers (5)', 'Buzz taster — 10 messages/mo'] },
+  { name: 'Sparkle', price: '£8.99', per: '/month · or £59/yr', blurb: 'Your planning co-pilot.', features: ['Everything unlimited — guests, budget, suppliers', 'RSVP & dietary tracking', 'Buzz — 200 messages/mo'], highlight: true },
   { name: 'Luxe', price: '£18.99', per: '/month · or £129/yr', blurb: 'The full monty.', features: ['Unlimited Buzz + venue research', 'Enquiry email drafting', 'Seating planner & day-of schedule', 'Crisis replanning'] },
 ]
 

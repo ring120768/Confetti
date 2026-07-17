@@ -6,7 +6,9 @@ const STAGES = ['researching', 'enquired', 'quoted', 'booked']
 const STAGE_LABEL = { researching: 'Researching 🔍', enquired: 'Enquired ✉️', quoted: 'Quoted 💷', booked: 'Booked ✅', rejected: 'Passed on' }
 const CATEGORIES = ['venue', 'catering', 'photography', 'videography', 'flowers', 'music', 'transport', 'beauty', 'stationery', 'cake', 'other']
 
-export default function Suppliers({ wedding, onAskBuzz }) {
+const FREE_SUPPLIER_CAP = 5
+
+export default function Suppliers({ wedding, tier = 'free', onAskBuzz, onUpgrade }) {
   const [suppliers, setSuppliers] = useState([])
   const [editing, setEditing] = useState(null) // supplier object or 'new'
   const [busy, setBusy] = useState(false)
@@ -47,7 +49,9 @@ export default function Suppliers({ wedding, onAskBuzz }) {
       <div className="card">
         <div className="pricing-head">
           <h3>Your suppliers</h3>
-          <button type="button" onClick={() => setEditing('new')}>+ Add</button>
+          {tier === 'free' && suppliers.length >= FREE_SUPPLIER_CAP
+            ? <button type="button" className="secondary" onClick={onUpgrade}>{FREE_SUPPLIER_CAP} supplier limit · Upgrade ✨</button>
+            : <button type="button" onClick={() => setEditing('new')}>+ Add</button>}
         </div>
         {suppliers.length === 0 && (
           <p className="meta">

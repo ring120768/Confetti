@@ -232,17 +232,16 @@ RULES:
         let result = "ok";
         if (block.name === "find_places") {
           result = await findPlaces(block.input.query, block.input.near, block.input.radius_miles);
+        } else if (block.name === "save_supplier" && tier === "free") {
+          const { count } = await supabase.from("suppliers")
+            .select("*", { count: "exact", head: true }).eq("wedding_id", wedding.id);
+          if ((count ?? 0) >= 5) {
+            result = "Their free plan's supplier list is full (5 of 5). Let them know warmly that Sparkle has unlimited suppliers with a 7-day free trial — don't save.";
+          } else {
+            result = await doSaveSupplier(supabase, wedding.id, block.input);
+          }
         } else if (block.name === "save_supplier") {
-          const { error: insErr } = await supabase.from("suppliers").insert({
-            wedding_id: wedding.id,
-            category: block.input.category ?? "venue",
-            name: block.input.name,
-            contact_email: block.input.contact_email ?? null,
-            phone: block.input.phone ?? null,
-            notes: block.input.notes ?? null,
-            stage: "researching",
-          });
-          result = insErr ? `failed: ${insErr.message}` : `saved ${block.input.name} to their supplier list`;
+          result = await doSaveSupplier(supabase, wedding.id, block.input);
         } else {
           result = "unknown tool";
         }
@@ -279,6 +278,19 @@ RULES:
     return json({ error: "Something went wrong" }, 500, cors);
   }
 });
+
+async function doSaveSupplier(supabase: any, weddingId: string, input: any): Promise<string> {
+  const { error } = await supabase.from("suppliers").insert({
+    wedding_id: weddingId,
+    category: input.category ?? "venue",
+    name: input.name,
+    contact_email: input.contact_email ?? null,
+    phone: input.phone ?? null,
+    notes: input.notes ?? null,
+    stage: "researching",
+  });
+  return error ? `failed: ${error.message}` : `saved ${input.name} to their supplier list`;
+}
 
 // Google Places search: postcode -> coordinates (postcodes.io, free) -> Places Text Search.
 // Returns a compact JSON string for Buzz, or a fallback notice if not configured.

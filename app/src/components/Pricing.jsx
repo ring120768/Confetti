@@ -5,12 +5,12 @@ const TIERS = [
   {
     key: 'free', name: 'Free', monthly: '£0', annual: '£0',
     blurb: 'The best free wedding checklist in the UK',
-    features: ['Full task plan with journey timeline', 'Reminders', 'Guest list (up to 50)', 'Simple budget totals', 'Buzz taster — 10 messages/mo'],
+    features: ['Full task plan with journey timeline', 'Calendar sync & reminders', 'Guest list (up to 50)', 'Budget tracker (15 items)', 'Supplier list (5)', 'Buzz taster — 10 messages/mo'],
   },
   {
     key: 'sparkle', name: 'Sparkle', monthly: '£8.99/mo', annual: '£59/yr',
     blurb: 'Your planning co-pilot',
-    features: ['Everything in Free', 'Full budget planner with UK benchmarks', 'Unlimited guests, RSVP links & dietary tracking', 'Supplier pipeline', 'Vision board', 'Buzz — 200 messages/mo with weekly check-ins'],
+    features: ['Everything in Free — without the limits', 'Unlimited guests, suppliers & budget items', 'RSVP & dietary tracking at full scale', 'Buzz — 200 messages/mo with weekly check-ins'],
   },
   {
     key: 'luxe', name: 'Luxe', monthly: '£18.99/mo', annual: '£129/yr',

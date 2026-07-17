@@ -179,9 +179,9 @@ export default function Plan({ wedding, onWeddingChange }) {
         ))}
       </nav>
 
-      {view === 'suppliers' && <Suppliers wedding={wedding} onAskBuzz={setBuzzAsk} />}
+      {view === 'suppliers' && <Suppliers wedding={wedding} tier={tier} onAskBuzz={setBuzzAsk} onUpgrade={() => setShowPricing(true)} />}
       {view === 'guests' && <Guests wedding={wedding} tier={tier} onUpgrade={() => setShowPricing(true)} />}
-      {view === 'budget' && <Budget wedding={wedding} onEditWedding={() => setShowEdit(true)} />}
+      {view === 'budget' && <Budget wedding={wedding} tier={tier} onEditWedding={() => setShowEdit(true)} onUpgrade={() => setShowPricing(true)} />}
 
       {view === 'plan' && <>
       <div className="card this-week">
