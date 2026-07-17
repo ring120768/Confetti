@@ -50,13 +50,15 @@ Deno.serve(async (req) => {
         const tier = sub.status === "active" || sub.status === "trialing"
           ? tierFromLookup(item?.price?.lookup_key)
           : "free";
+        // newer Stripe API versions moved current_period_end onto the subscription item
+        const periodEnd = (sub as any).current_period_end ?? (item as any)?.current_period_end;
         await admin.from("subscriptions").upsert({
           couple_id: coupleId,
           tier,
           status: sub.status,
           stripe_customer_id: String(sub.customer),
           stripe_subscription_id: sub.id,
-          current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+          current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
         }, { onConflict: "couple_id" });
         break;
       }

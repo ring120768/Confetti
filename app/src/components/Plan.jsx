@@ -10,6 +10,39 @@ import Guests from './Guests.jsx'
 import Budget from './Budget.jsx'
 import AddTask from './AddTask.jsx'
 
+// Calendar subscription sheet: one tap and the plan lives in their phone
+// calendar, auto-updating. Alerts come free from the calendar app.
+function CalendarSync({ token, onClose }) {
+  const [copied, setCopied] = useState(false)
+  const feedUrl = `https://mrkotkgivhnydtrzyoct.supabase.co/functions/v1/calendar?token=${token}`
+  const webcal = feedUrl.replace('https://', 'webcal://')
+  const copy = async () => {
+    await navigator.clipboard.writeText(feedUrl)
+    setCopied(true); setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <div className="sheet-overlay" onClick={onClose}>
+      <div className="sheet" onClick={e => e.stopPropagation()}>
+        <div className="sheet-handle" />
+        <h3>Your plan, in your calendar 📅</h3>
+        <p className="meta">Every dated task appears in your phone's calendar and stays in sync as your plan changes — with the big day itself front and centre.</p>
+        <div className="sheet-actions">
+          <a href={webcal}><button type="button" style={{ width: '100%' }}>Apple / Outlook — subscribe</button></a>
+          <a href={`https://calendar.google.com/calendar/u/0/r/settings/addbyurl?curl=${encodeURIComponent(webcal)}`}
+             target="_blank" rel="noopener noreferrer">
+            <button type="button" style={{ width: '100%' }}>Google Calendar — subscribe</button>
+          </a>
+          <button type="button" className="secondary" onClick={copy}>
+            {copied ? 'Link copied ✓' : 'Copy feed link'}
+          </button>
+          <button type="button" className="secondary" onClick={onClose}>Close</button>
+        </div>
+        <p className="meta">Google not taking the link? Paste the copied link in Google Calendar → Settings → Add calendar → From URL.</p>
+      </div>
+    </div>
+  )
+}
+
 // A little confetti burst from the ticked checkbox — brand moment.
 const CONFETTI = ['#F7D6B8', '#F4C9C5', '#F5E6A8', '#C9DCEA', '#C8E0CC', '#D6CCE4', '#D49A2E']
 function confettiBurst(el) {
@@ -41,6 +74,7 @@ export default function Plan({ wedding, onWeddingChange }) {
   const [showEdit, setShowEdit] = useState(false)
   const [view, setView] = useState('plan') // plan | guests | budget | suppliers
   const [showAddTask, setShowAddTask] = useState(false)
+  const [showCalSync, setShowCalSync] = useState(false)
 
   const loadTasks = () =>
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id)
@@ -151,7 +185,13 @@ export default function Plan({ wedding, onWeddingChange }) {
 
       {view === 'plan' && <>
       <div className="card this-week">
-        <h3>This week 🗓</h3>
+        <div className="pricing-head">
+          <h3>This week 🗓</h3>
+          {wedding.ics_token && (
+            <button type="button" className="secondary" style={{ fontSize: 13, padding: '6px 12px' }}
+                    onClick={() => setShowCalSync(true)}>📅 Sync to calendar</button>
+          )}
+        </div>
         {thisWeek.length === 0
           ? <p className="meta">Nothing due this week — you're ahead of the game. Enjoy being engaged! 💛</p>
           : thisWeek.map(t => renderTask(t))}
@@ -192,6 +232,8 @@ export default function Plan({ wedding, onWeddingChange }) {
         {groups[shown]?.map(t => renderTask(t))}
       </div>
       </>}
+
+      {showCalSync && <CalendarSync token={wedding.ics_token} onClose={() => setShowCalSync(false)} />}
 
       {showAddTask && (
         <AddTask wedding={wedding} onClose={() => setShowAddTask(false)}
