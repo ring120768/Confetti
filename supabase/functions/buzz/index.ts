@@ -286,14 +286,23 @@ async function findPlaces(query: string, near: string, radiusMiles = 25): Promis
   const key = Deno.env.get("GOOGLE_MAPS_API_KEY");
   if (!key) return "find_places is not configured — use web_search instead.";
   try {
-    // geocode: UK postcode via postcodes.io, otherwise let Places bias by text
+    // geocode anywhere in the world: UK postcodes via postcodes.io (free),
+    // everything else (US zips, EU codes, place names) via Google Geocoding.
     let lat: number | null = null, lng: number | null = null;
-    const postcode = near.trim().match(/^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i);
-    if (postcode) {
+    const ukPostcode = near.trim().match(/^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i);
+    if (ukPostcode) {
       const r = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(near.trim())}`);
       if (r.ok) {
         const g = await r.json();
         lat = g.result?.latitude; lng = g.result?.longitude;
+      }
+    }
+    if (lat == null) {
+      const r = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(near)}&key=${key}`);
+      if (r.ok) {
+        const g = await r.json();
+        const loc = g.results?.[0]?.geometry?.location;
+        if (loc) { lat = loc.lat; lng = loc.lng; }
       }
     }
     const radiusM = Math.min(Math.max(radiusMiles, 1), 50) * 1609;

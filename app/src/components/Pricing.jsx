@@ -46,6 +46,8 @@ export default function Pricing({ currentTier = 'free', onClose }) {
         <button className="secondary" onClick={onClose}>Back to plan</button>
       </div>
 
+      <p className="meta">Every paid plan starts with a 7-day free trial — cancel anytime before it ends and pay nothing.</p>
+
       <div className="billing-toggle">
         <button className={annual ? 'secondary' : ''} onClick={() => setAnnual(false)}>Monthly</button>
         <button className={annual ? '' : 'secondary'} onClick={() => setAnnual(true)}>Annual (save ~40%)</button>
@@ -65,7 +67,7 @@ export default function Pricing({ currentTier = 'free', onClose }) {
             currentTier !== 'free' && <button className="secondary" onClick={managePlan}>Downgrade via billing portal</button>
           ) : (
             <button onClick={() => choose(t.key)} disabled={busy === t.key}>
-              {busy === t.key ? 'Opening checkout…' : `Get ${t.name} ✨`}
+              {busy === t.key ? 'Opening checkout…' : `Try ${t.name} free for 7 days ✨`}
             </button>
           )}
         </div>

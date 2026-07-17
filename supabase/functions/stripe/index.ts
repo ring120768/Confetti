@@ -79,7 +79,10 @@ Deno.serve(async (req) => {
       mode: "subscription",
       line_items: [{ price: price.id, quantity: 1 }],
       allow_promotion_codes: true,
-      subscription_data: { metadata: { couple_id: wedding.couple_id } },
+      subscription_data: {
+        metadata: { couple_id: wedding.couple_id },
+        trial_period_days: 7, // card up front, first charge after a week
+      },
       metadata: { couple_id: wedding.couple_id },
       success_url: `${SITE}/?checkout=success`,
       cancel_url: `${SITE}/?checkout=cancelled`,
