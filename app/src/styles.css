@@ -147,6 +147,11 @@ label { font-weight: 600; font-size: 14px; }
 .task.skipped { opacity: 0.55; }
 .task.skipped .title { text-decoration: line-through; }
 
+/* Upgrade nudges */
+.quota-upsell { text-align: center; padding: 8px 0; }
+.quota-upsell button { width: 100%; margin-top: 4px; }
+.milestone-nudge { border: 2px solid var(--lilac); }
+
 /* View tabs */
 .view-tabs { display: flex; gap: 8px; margin: 4px 0 12px; }
 .view-tabs button {

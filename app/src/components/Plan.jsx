@@ -197,6 +197,21 @@ export default function Plan({ wedding, onWeddingChange }) {
           : thisWeek.map(t => renderTask(t))}
       </div>
 
+      {tier === 'free' && tasks.filter(t => t.status === 'done').length >= 10 &&
+        !localStorage.getItem('wppNudge10') && (
+        <div className="card milestone-nudge">
+          <p><strong>10 tasks done — you're properly planning now! 🎉</strong></p>
+          <p className="meta">Couples at this stage get the most from Sparkle: unlimited guests, the full budget planner, and Buzz with 200 messages a month for the venue-hunting ahead.</p>
+          <div className="draft-actions">
+            <button type="button" onClick={() => setShowPricing(true)}>Try Sparkle free for 7 days ✨</button>
+            <button type="button" className="secondary"
+                    onClick={(e) => { localStorage.setItem('wppNudge10', '1'); e.target.closest('.milestone-nudge').remove() }}>
+              Maybe later
+            </button>
+          </div>
+        </div>
+      )}
+
       {overdueTasks.length > 0 && (
         <button type="button" className={'overdue-chip' + (showOverdue ? ' active' : '')}
                 onClick={() => setShowOverdue(v => !v)}>
@@ -265,7 +280,8 @@ export default function Plan({ wedding, onWeddingChange }) {
         />
       )}
 
-      <Buzz wedding={wedding} tier={tier} ask={buzzAsk} onAskConsumed={() => setBuzzAsk(null)} />
+      <Buzz wedding={wedding} tier={tier} ask={buzzAsk} onAskConsumed={() => setBuzzAsk(null)}
+            onUpgrade={() => setShowPricing(true)} />
     </div>
   )
 }

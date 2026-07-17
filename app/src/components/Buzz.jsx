@@ -81,7 +81,8 @@ const STARTERS = [
   "How much should we budget for flowers?",
 ]
 
-export default function Buzz({ wedding, tier = 'free', ask, onAskConsumed }) {
+export default function Buzz({ wedding, tier = 'free', ask, onAskConsumed, onUpgrade }) {
+  const [quotaHit, setQuotaHit] = useState(false)
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -139,7 +140,7 @@ export default function Buzz({ wedding, tier = 'free', ask, onAskConsumed }) {
           console.error('Buzz request failed:', error.message, raw) // detail for devs, not couples
           try {
             const body = JSON.parse(raw)
-            if (body?.error === 'quota') detail = body.detail + ' Upgrade for more. ✨'
+            if (body?.error === 'quota') { detail = body.detail; setQuotaHit(true) }
             else if (body?.error) detail = body.error
           } catch { /* keep friendly default */ }
         } catch { console.error('Buzz request failed:', error?.message) }
@@ -184,6 +185,12 @@ export default function Buzz({ wedding, tier = 'free', ask, onAskConsumed }) {
         )}
         {messages.map((m, i) => <Message key={i} role={m.role} content={m.content} time={stamp(m.created_at)} />)}
         {busy && <Typing />}
+        {quotaHit && onUpgrade && (
+          <div className="quota-upsell">
+            <p className="meta">Buzz would love to keep helping — Sparkle gets you 200 messages a month, Luxe unlimited.</p>
+            <button type="button" onClick={() => { setOpen(false); onUpgrade() }}>See plans — 7 days free ✨</button>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
       <form onSubmit={send} className="buzz-input">
