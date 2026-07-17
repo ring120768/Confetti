@@ -74,6 +74,7 @@ export default function App() {
           </form>
         )}
       </div>
+      <p className="meta"><a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></p>
     </div>
   )
 
@@ -89,6 +90,7 @@ export default function App() {
         <a href="#" onClick={async (e) => { e.preventDefault(); await supabase.auth.signOut(); setWedding(null) }}>
           Sign out
         </a>
+        <br /><a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a>
       </footer>
     </>
   )
