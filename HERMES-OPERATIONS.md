@@ -42,7 +42,7 @@ relevant APP PROFILE. Written 19 Jul 2026; owner: Ian Ring.*
 
 ### Profile: WPP — Wedding Planner Pro
 - Public name: Wedding Planner Pro (fallback: Wedding Planner Pro UK)
-- Bundle/App ID: uk.co.weddingplannerpro.app · SKU: wpp001
+- Bundle/App ID: uk.co.weddingplannerpro.mobile · SKU: wpp001 (NOTE: former ID uk.co.weddingplannerpro.app is dead — squatted by an Xcode auto-registration in Ian's free personal team; never reuse it)
 - Domain: weddingplannerpro.co.uk (DNS at Hostinger) · App URL: https://www.weddingplannerpro.co.uk
 - Support: help@weddingplannerpro.co.uk · Privacy: /privacy.html · Terms: /terms.html
 - Backend: Supabase project mrkotkgivhnydtrzyoct · Payments: Stripe acct "Wedding Planner Pro" (WEB ONLY — store apps are sign-in-only, sell nothing)

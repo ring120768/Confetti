@@ -5,7 +5,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 // for content changes. The web app detects Capacitor and hides purchase
 // paths to comply with App Store / Play billing rules.
 const config: CapacitorConfig = {
-  appId: 'uk.co.weddingplannerpro.app',
+  appId: 'uk.co.weddingplannerpro.mobile',
   appName: 'Wedding Planner Pro',
   webDir: 'dist',
   server: {
