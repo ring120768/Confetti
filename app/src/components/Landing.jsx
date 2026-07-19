@@ -40,7 +40,7 @@ export default function Landing() {
       </header>
 
       <section className="hero" id="signup">
-        <img src="/heart.png" alt="" className="logo-hero" />
+        <img src="/buzz-heart-web.png" alt="Buzz, your AI wedding planner, inside a heart of confetti" className="logo-hero logo-hero-buzz" />
         <h1>The wedding planner you didn't think you could afford</h1>
         <p className="sub">A professional planner costs £3,000+. Wedding Planner Pro gives you the same job description — a complete plan timed to your day, and Buzz, an AI planner who researches venues, chases what's late, and even drafts your emails — from free.</p>
         <EmailSignIn />

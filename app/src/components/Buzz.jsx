@@ -174,7 +174,8 @@ export default function Buzz({ wedding, tier = 'free', ask, onAskConsumed, onUpg
       </div>
       <div className="buzz-thread">
         {messages.length === 0 && (
-          <div>
+          <div className="buzz-empty">
+            <img src="/buzz-heart-web.png" alt="" className="buzz-empty-hero" />
             <p className="meta">Hi! I'm Buzz, your wedding planner. Try one of these to get going 🐝</p>
             <div className="starter-chips">
               {STARTERS.map(s => (
