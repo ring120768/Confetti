@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Wedding Planner Pro</string>
+    <string name="title_activity_main">Wedding Planner Pro</string>
+    <string name="package_name">uk.co.weddingplannerpro.app</string>
+    <string name="custom_url_scheme">uk.co.weddingplannerpro.app</string>
+</resources>

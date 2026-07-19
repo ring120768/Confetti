@@ -1,0 +1,13 @@
+{
+  "name": "Wedding Planner Pro",
+  "short_name": "Planner Pro",
+  "description": "Buzz, your AI wedding planner — where every detail sparkles",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF6EE",
+  "theme_color": "#FAF6EE",
+  "icons": [
+    { "src": "/confetti-app-icon.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/confetti-app-icon-180.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
