@@ -92,7 +92,7 @@ export default function Landing() {
 
       <footer className="landing-footer">
         <p className="meta">Where every detail sparkles ✨</p>
-        <p className="meta"><a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="mailto:help@weddingplannerpro.co.uk">help@weddingplannerpro.co.uk</a></p>
+        <p className="meta"><a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/delete-account.html">Delete account</a> · <a href="mailto:help@weddingplannerpro.co.uk">help@weddingplannerpro.co.uk</a></p>
       </footer>
     </div>
   )
