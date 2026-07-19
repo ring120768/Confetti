@@ -185,7 +185,7 @@ export default function Buzz({ wedding, tier = 'free', ask, onAskConsumed, onUpg
         )}
         {messages.map((m, i) => <Message key={i} role={m.role} content={m.content} time={stamp(m.created_at)} />)}
         {busy && <Typing />}
-        {quotaHit && onUpgrade && (
+        {quotaHit && onUpgrade && !window.Capacitor?.isNativePlatform?.() && (
           <div className="quota-upsell">
             <p className="meta">Buzz would love to keep helping — Sparkle gets you 200 messages a month, Luxe unlimited.</p>
             <button type="button" onClick={() => { setOpen(false); onUpgrade() }}>See plans — 7 days free ✨</button>

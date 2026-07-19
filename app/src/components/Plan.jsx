@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase.js'
 import { PHASES, currentPhase, groupByPhase, phaseProgress, dueDate, isOverdue, formatDue } from '../lib/engine.js'
 import Buzz from './Buzz.jsx'
 import Pricing from './Pricing.jsx'
+import { isNativeApp } from '../lib/platform.js'
 import TaskSheet from './TaskSheet.jsx'
 import EditWedding from './EditWedding.jsx'
 import Suppliers from './Suppliers.jsx'
@@ -158,7 +159,8 @@ export default function Plan({ wedding, onWeddingChange }) {
         <img src="/heart.png" alt="Wedding Planner Pro" className="logo-small" />
         <h1>Your wedding plan</h1>
         <button className="secondary tier-badge" onClick={() => setShowPricing(true)}>
-          {tier === 'free' ? 'Free · Upgrade ✨' : tier === 'sparkle' ? 'Sparkle ✨' : 'Luxe 👑'}
+          {tier === 'sparkle' ? 'Sparkle ✨' : tier === 'luxe' ? 'Luxe 👑'
+            : isNativeApp() ? 'Free plan' : 'Free · Upgrade ✨'}
         </button>
       </header>
       {daysToGo !== null && (
@@ -197,7 +199,7 @@ export default function Plan({ wedding, onWeddingChange }) {
           : thisWeek.map(t => renderTask(t))}
       </div>
 
-      {tier === 'free' && tasks.filter(t => t.status === 'done').length >= 10 &&
+      {tier === 'free' && !isNativeApp() && tasks.filter(t => t.status === 'done').length >= 10 &&
         !localStorage.getItem('wppNudge10') && (
         <div className="card milestone-nudge">
           <p><strong>10 tasks done — you're properly planning now! 🎉</strong></p>

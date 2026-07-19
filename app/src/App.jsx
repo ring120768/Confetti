@@ -5,6 +5,8 @@ import Plan from './components/Plan.jsx'
 import InstallPrompt from './components/InstallPrompt.jsx'
 import Reveal from './components/Reveal.jsx'
 import Landing from './components/Landing.jsx'
+import EmailSignIn from './components/EmailSignIn.jsx'
+import { isNativeApp } from './lib/platform.js'
 
 // Screens: loading -> signin -> onboarding (no wedding yet) -> plan
 export default function App() {
@@ -32,7 +34,16 @@ export default function App() {
 
   if (loading) return <p>Loading…</p>
 
-  if (!session) return <Landing />
+  // Store builds get a clean sign-in (no marketing, no pricing — store rules);
+  // the web gets the full landing page.
+  if (!session) return isNativeApp() ? (
+    <div className="welcome" style={{ paddingTop: 48 }}>
+      <img src="/heart.png" alt="" className="logo-hero" />
+      <h1>Wedding Planner Pro</h1>
+      <p className="tagline">Where every detail sparkles</p>
+      <EmailSignIn cta="Sign in / create account ✨" />
+    </div>
+  ) : <Landing />
 
   if (!wedding) return <Onboarding onCreated={(w) => { setWedding(w); setJustCreated(true) }} />
 

@@ -12,6 +12,7 @@ export default function InstallPrompt() {
   useEffect(() => {
     const standalone = window.matchMedia('(display-mode: standalone)').matches
       || window.navigator.standalone === true
+      || !!window.Capacitor?.isNativePlatform?.() // already a real app
     if (standalone || localStorage.getItem('installPromptDismissed')) return
 
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent)

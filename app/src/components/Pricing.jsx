@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase.js'
+import { isNativeApp } from '../lib/platform.js'
 
 const TIERS = [
   {
@@ -23,6 +24,24 @@ const TIERS = [
 export default function Pricing({ currentTier = 'free', onClose }) {
   const [annual, setAnnual] = useState(false)
   const [busy, setBusy] = useState(null)
+
+  // Store builds: no purchasing, no steering — just show what each plan includes.
+  if (isNativeApp()) return (
+    <div className="pricing">
+      <div className="pricing-head">
+        <h2>Plans</h2>
+        <button className="secondary" onClick={onClose}>Back to plan</button>
+      </div>
+      {TIERS.map(t => (
+        <div key={t.key} className={'card tier' + (t.highlight ? ' highlight' : '')}>
+          <div className="tier-head"><h3>{t.name}</h3></div>
+          <p className="meta">{t.blurb}</p>
+          <ul>{t.features.map(f => <li key={f}>{f}</li>)}</ul>
+          {currentTier === t.key && <button className="secondary" disabled>Your current plan</button>}
+        </div>
+      ))}
+    </div>
+  )
 
   async function choose(tierKey) {
     if (tierKey === 'free' || tierKey === currentTier) return
