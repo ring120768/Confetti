@@ -225,6 +225,11 @@ label { font-weight: 600; font-size: 14px; }
 .sheet-row { display: flex; gap: 8px; align-items: center; }
 .sheet-row input { margin: 0; flex: 1; }
 .sheet-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.delegate-form { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.delegate-form input, .delegate-form textarea { margin: 0; width: 100%; }
+.delegate-pick { display: flex; gap: 8px; }
+.delegate-pick select { flex: 1; margin: 0; }
+.delegate-pick button { white-space: nowrap; }
 .bubble.assistant a, .meta a { color: var(--teal); word-break: break-all; }
 
 /* Landing page */

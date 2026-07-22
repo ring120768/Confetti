@@ -76,13 +76,26 @@ export default function Plan({ wedding, onWeddingChange }) {
   const [view, setView] = useState('plan') // plan | guests | budget | suppliers
   const [showAddTask, setShowAddTask] = useState(false)
   const [showCalSync, setShowCalSync] = useState(false)
+  const [delegations, setDelegations] = useState({}) // task_id -> latest delegation
 
   const loadTasks = () =>
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id)
       .then(({ data }) => setTasks(data || []))
 
+  const loadDelegations = () =>
+    supabase.from('task_delegations')
+      .select('task_id,delegate_name,status,created_at')
+      .eq('wedding_id', wedding.id)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        const map = {}
+        for (const d of data || []) if (!map[d.task_id]) map[d.task_id] = d
+        setDelegations(map)
+      })
+
   useEffect(() => {
     loadTasks()
+    loadDelegations()
     supabase.from('task_library').select('id,phase,priority,guidance,typical_cost_gbp,ask_suppliers')
       .then(({ data }) => setLibrary(Object.fromEntries((data || []).map(r => [r.id, r]))))
     supabase.from('subscriptions').select('tier').eq('couple_id', wedding.couple_id).maybeSingle()
@@ -131,6 +144,15 @@ export default function Plan({ wedding, onWeddingChange }) {
             {library[t.library_id]?.priority || 'custom'}
           </span>
         </div>
+        {delegations[t.id] && (
+          <div className="meta">
+            🤝 {delegations[t.id].delegate_name} · {
+              delegations[t.id].status === 'done' ? 'done ✅'
+                : delegations[t.id].status === 'declined' ? 'passed on'
+                : 'helping out'
+            }
+          </div>
+        )}
         {library[t.library_id]?.guidance && t.status !== 'done' && (
           <div className="meta">{library[t.library_id].guidance}</div>
         )}
@@ -261,6 +283,10 @@ export default function Plan({ wedding, onWeddingChange }) {
         <TaskSheet
           task={sheetTask}
           lib={library[sheetTask.library_id]}
+          delegation={delegations[sheetTask.id]}
+          tier={tier}
+          onUpgrade={() => setShowPricing(true)}
+          onDelegated={(taskId, del) => { if (del) setDelegations(m => ({ ...m, [taskId]: del })) }}
           onClose={() => setSheetTask(null)}
           onPatched={(updated) => {
             setTasks(ts => ts.map(x => x.id === updated.id ? updated : x))

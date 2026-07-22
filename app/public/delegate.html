@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>A wedding task for you — Wedding Planner Pro</title>
+<style>
+  :root { --rose:#c9526a; --cream:#faf6f0; --ink:#2b2b2b; --muted:#7a7a7a; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:#2b2b2b; background:#fbf7f2; line-height:1.55;
+    display:flex; min-height:100vh; align-items:flex-start; justify-content:center; padding:24px 16px;
+  }
+  .wrap { width:100%; max-width:460px; }
+  .card { background:#fff; border-radius:20px; padding:28px 24px; box-shadow:0 8px 30px rgba(0,0,0,.06); }
+  .brand { text-align:center; margin-bottom:6px; }
+  .brand img { width:56px; height:56px; }
+  h1 { font-size:22px; margin:14px 0 4px; text-align:center; }
+  .sub { text-align:center; color:#8a8a8a; font-size:14px; margin:0 0 18px; }
+  .task { background:var(--cream); border-radius:14px; padding:18px 20px; margin:18px 0; }
+  .task h2 { font-size:19px; margin:0 0 8px; }
+  .task .g { font-size:14px; color:#555; margin:8px 0 0; }
+  .task .note { font-size:14px; margin:12px 0 0; font-style:italic; }
+  .meta { font-size:13px; color:#8a8a8a; }
+  label { font-size:14px; font-weight:600; display:block; margin:18px 0 6px; }
+  textarea { width:100%; border:1px solid #e5ddd3; border-radius:12px; padding:12px; font:inherit; resize:vertical; }
+  button {
+    width:100%; border:0; border-radius:999px; padding:14px; font-size:16px; font-weight:600;
+    cursor:pointer; margin-top:12px; font-family:inherit;
+  }
+  .primary { background:var(--rose); color:#fff; }
+  .ghost { background:transparent; color:#8a8a8a; }
+  .primary:disabled { opacity:.6; cursor:default; }
+  .center { text-align:center; }
+  .big { font-size:40px; margin:6px 0; }
+  .hide { display:none; }
+  a { color:var(--rose); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand"><img src="/buzz-heart-web.png" alt="Wedding Planner Pro" /></div>
+
+      <div id="loading" class="center meta">Loading your task…</div>
+
+      <div id="notfound" class="hide center">
+        <h1>Link not found</h1>
+        <p class="sub">This delegation link isn't valid or has expired. Ask the couple to send you a fresh one.</p>
+      </div>
+
+      <div id="task" class="hide">
+        <h1 id="greeting">Can you help? 💍</h1>
+        <p class="sub" id="fromline"></p>
+        <div class="task">
+          <h2 id="tasktitle"></h2>
+          <p class="g hide" id="guidance"></p>
+          <p class="note hide" id="pmessage"></p>
+          <p class="meta hide" id="dueline"></p>
+        </div>
+        <label for="note">Leave a note (optional)</label>
+        <textarea id="note" rows="3" placeholder="Anything to pass back to the couple…"></textarea>
+        <button class="primary" id="doneBtn">Mark it done ✅</button>
+        <button class="ghost" id="declineBtn">I can't take this on</button>
+      </div>
+
+      <div id="thanks" class="hide center">
+        <div class="big" id="thanksIcon">🎉</div>
+        <h1 id="thanksTitle">Thank you!</h1>
+        <p class="sub" id="thanksBody"></p>
+        <p class="meta">You can close this page. The couple has been let know.</p>
+        <p class="meta" style="margin-top:18px">Planning your own wedding? <a href="https://www.weddingplannerpro.co.uk">Try Wedding Planner Pro →</a></p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const FN = "https://mrkotkgivhnydtrzyoct.supabase.co/functions/v1/delegate";
+  const KEY = "sb_publishable_GVKpdOC4lSJu4nocdnSJHQ_gDWIChQy";
+  const HEADERS = { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json" };
+  const token = new URLSearchParams(location.search).get("t") || "";
+  const $ = id => document.getElementById(id);
+
+  function show(id) { for (const s of ["loading","notfound","task","thanks"]) $(s).classList.toggle("hide", s !== id); }
+  function fmtDate(iso) {
+    if (!iso) return "";
+    try { return new Date(iso).toLocaleDateString("en-GB", { day:"numeric", month:"long", year:"numeric" }); }
+    catch { return iso; }
+  }
+
+  async function load() {
+    if (!token) return show("notfound");
+    try {
+      const r = await fetch(FN + "?t=" + encodeURIComponent(token), { headers: HEADERS });
+      const d = await r.json();
+      if (!r.ok || d.error) return show("notfound");
+
+      if (d.status === "done" || d.status === "declined") return finished(d.status, true);
+
+      $("greeting").textContent = "Hi " + d.delegate_name + " 👋";
+      $("fromline").textContent = "Someone planning their wedding would love a hand with this:";
+      $("tasktitle").textContent = d.task_title;
+      if (d.guidance) { $("guidance").textContent = d.guidance; $("guidance").classList.remove("hide"); }
+      if (d.message) { $("pmessage").textContent = "“" + d.message + "”"; $("pmessage").classList.remove("hide"); }
+      if (d.due) { $("dueline").textContent = "Ideally by " + fmtDate(d.due); $("dueline").classList.remove("hide"); }
+      show("task");
+    } catch { show("notfound"); }
+  }
+
+  async function submit(action) {
+    $("doneBtn").disabled = true; $("declineBtn").disabled = true;
+    $("doneBtn").textContent = "Saving…";
+    try {
+      const r = await fetch(FN, {
+        method: "POST", headers: HEADERS,
+        body: JSON.stringify({ t: token, action, note: $("note").value }),
+      });
+      const d = await r.json();
+      if (!r.ok || d.error) throw new Error();
+      finished(action === "done" ? "done" : "declined", false);
+    } catch {
+      $("doneBtn").disabled = false; $("declineBtn").disabled = false;
+      $("doneBtn").textContent = "Mark it done ✅";
+      alert("Something went wrong — please try again.");
+    }
+  }
+
+  function finished(status, already) {
+    if (status === "done") {
+      $("thanksIcon").textContent = "🎉";
+      $("thanksTitle").textContent = already ? "Already done ✅" : "You're a star! 🎉";
+      $("thanksBody").textContent = already
+        ? "This task has been marked done. Nothing more to do."
+        : "That's ticked off their plan. Thank you for helping their big day along.";
+    } else {
+      $("thanksIcon").textContent = "💛";
+      $("thanksTitle").textContent = already ? "Already passed on" : "No problem at all";
+      $("thanksBody").textContent = "We've let the couple know so they can sort it another way.";
+    }
+    show("thanks");
+  }
+
+  $("doneBtn").addEventListener("click", () => submit("done"));
+  $("declineBtn").addEventListener("click", () => submit("decline"));
+  load();
+</script>
+</body>
+</html>
