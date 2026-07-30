@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase.js'
 // The supplier pipeline — where Buzz's saved venues finally become visible.
 const STAGES = ['researching', 'enquired', 'quoted', 'booked']
 const STAGE_LABEL = { researching: 'Researching 🔍', enquired: 'Enquired ✉️', quoted: 'Quoted 💷', booked: 'Booked ✅', rejected: 'Passed on' }
-const CATEGORIES = ['venue', 'catering', 'photography', 'videography', 'flowers', 'music', 'transport', 'beauty', 'stationery', 'cake', 'other']
+const CATEGORIES = ['venue', 'planner', 'catering', 'photography', 'videography', 'flowers', 'music', 'transport', 'beauty', 'stationery', 'cake', 'other']
 
 const FREE_SUPPLIER_CAP = 5
 
@@ -53,6 +53,11 @@ export default function Suppliers({ wedding, tier = 'free', onAskBuzz, onUpgrade
             ? <button type="button" className="secondary" onClick={onUpgrade}>{FREE_SUPPLIER_CAP} supplier limit · Upgrade ✨</button>
             : <button type="button" onClick={() => setEditing('new')}>+ Add</button>}
         </div>
+        <button type="button" className="find-planner"
+                onClick={() => onAskBuzz({ text: 'Find a few wedding planners or on-the-day coordinators near us — with Google ratings and contact details — and offer to save any we like to our suppliers.' })}>
+          🔍 Find a wedding planner near you
+        </button>
+        <p className="meta">Running the day yourself, or working with a planner? Buzz can find a professional near you — from full planning to on-the-day coordination.</p>
         {suppliers.length === 0 && (
           <p className="meta">
             Nothing here yet. Ask Buzz to research venues or photographers —

@@ -237,6 +237,7 @@ label { font-weight: 600; font-size: 14px; }
 .schedule-title { font-weight: 600; }
 .schedule-who { font-size: 13px; }
 .linklike.danger { color: #c0392b; background: none; border: 0; cursor: pointer; }
+.find-planner { width: 100%; margin: 6px 0 4px; }
 .bubble.assistant a, .meta a { color: var(--teal); word-break: break-all; }
 
 /* Landing page */
