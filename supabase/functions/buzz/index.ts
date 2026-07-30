@@ -150,6 +150,11 @@ RULES:
 - TAKING ACTION: when the couple shows real interest in a specific venue or supplier
   ("we love the look of X"), offer two things: to save it to their supplier list (use the
   save_supplier tool) and to draft an availability enquiry email they can send themselves.
+- RUNNING ORDER: if they ask for a wedding-day schedule / running order / timeline for the day,
+  build a sensible one (getting ready, travel, ceremony, drinks reception, wedding breakfast,
+  speeches, cake, first dance, evening) anchored to their ceremony time — ask for it if you don't
+  know it — and save it with add_schedule_items. This is a Luxe feature: if they aren't on Luxe,
+  don't save it and warmly mention Luxe includes Buzz building their full running order.
 - CONTACT DETAILS: before saving a supplier or drafting an enquiry, use web search to find
   their official contact details — email and phone from their OWN website (contact page),
   not from directories. Include what you find in save_supplier and in the draft's To: line.
@@ -202,6 +207,30 @@ RULES:
           required: ["category", "name"],
         },
       },
+      {
+        name: "add_schedule_items",
+        description: "Add items to the couple's on-the-day running order — their wedding-day schedule (e.g. 09:00 hair & makeup, 13:00 ceremony, 19:30 first dance). Use when they ask you to build, draft or add to their running order / schedule / timeline for the day. Give sensible 24h times.",
+        input_schema: {
+          type: "object",
+          properties: {
+            items: {
+              type: "array",
+              description: "the schedule items to add, in order",
+              items: {
+                type: "object",
+                properties: {
+                  time: { type: "string", description: "24h HH:MM, e.g. 13:00" },
+                  title: { type: "string", description: "what's happening" },
+                  who: { type: "string", description: "who's responsible (optional)" },
+                  note: { type: "string", description: "optional detail" },
+                },
+                required: ["title"],
+              },
+            },
+          },
+          required: ["items"],
+        },
+      },
     ];
 
     // ---- call Claude, executing tools until she's done (max 4 rounds) ----
@@ -242,6 +271,10 @@ RULES:
           }
         } else if (block.name === "save_supplier") {
           result = await doSaveSupplier(supabase, wedding.id, block.input);
+        } else if (block.name === "add_schedule_items" && tier !== "luxe") {
+          result = "The on-the-day running order is a Luxe feature. Warmly let them know Luxe has you build their full wedding-day schedule for them — don't add anything.";
+        } else if (block.name === "add_schedule_items") {
+          result = await doAddSchedule(supabase, wedding.id, block.input.items);
         } else {
           result = "unknown tool";
         }
@@ -278,6 +311,22 @@ RULES:
     return json({ error: "Something went wrong" }, 500, cors);
   }
 });
+
+async function doAddSchedule(supabase: any, weddingId: string, items: any[]): Promise<string> {
+  if (!Array.isArray(items) || !items.length) return "no items provided";
+  const rows = items
+    .map((it, i) => ({
+      wedding_id: weddingId,
+      time: it.time ?? null,
+      title: it.title,
+      who: it.who ?? null,
+      note: it.note ?? null,
+      sort_order: i,
+    }))
+    .filter((r) => r.title);
+  const { error } = await supabase.from("schedule_items").insert(rows);
+  return error ? `failed: ${error.message}` : `added ${rows.length} items to their running order`;
+}
 
 async function doSaveSupplier(supabase: any, weddingId: string, input: any): Promise<string> {
   const { error } = await supabase.from("suppliers").insert({

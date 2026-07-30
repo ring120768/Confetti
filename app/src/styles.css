@@ -230,6 +230,13 @@ label { font-weight: 600; font-size: 14px; }
 .delegate-pick { display: flex; gap: 8px; }
 .delegate-pick select { flex: 1; margin: 0; }
 .delegate-pick button { white-space: nowrap; }
+.schedule-item { display: flex; gap: 8px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #eee; }
+.schedule-item input[type=time] { width: 100px; margin: 0; }
+.schedule-body { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.schedule-body input { margin: 0; width: 100%; }
+.schedule-title { font-weight: 600; }
+.schedule-who { font-size: 13px; }
+.linklike.danger { color: #c0392b; background: none; border: 0; cursor: pointer; }
 .bubble.assistant a, .meta a { color: var(--teal); word-break: break-all; }
 
 /* Landing page */

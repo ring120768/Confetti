@@ -9,6 +9,7 @@ import EditWedding from './EditWedding.jsx'
 import Suppliers from './Suppliers.jsx'
 import Guests from './Guests.jsx'
 import Budget from './Budget.jsx'
+import OnTheDay from './OnTheDay.jsx'
 import AddTask from './AddTask.jsx'
 
 // Calendar subscription sheet: one tap and the plan lives in their phone
@@ -198,7 +199,7 @@ export default function Plan({ wedding, onWeddingChange }) {
       )}
 
       <nav className="view-tabs">
-        {[['plan', 'Plan'], ['guests', 'Guests'], ['budget', 'Budget'], ['suppliers', 'Suppliers']].map(([k, label]) => (
+        {[['plan', 'Plan'], ['guests', 'Guests'], ['budget', 'Budget'], ['suppliers', 'Suppliers'], ['day', 'On the Day']].map(([k, label]) => (
           <button key={k} type="button" className={view === k ? 'active' : ''} onClick={() => setView(k)}>{label}</button>
         ))}
       </nav>
@@ -206,6 +207,7 @@ export default function Plan({ wedding, onWeddingChange }) {
       {view === 'suppliers' && <Suppliers wedding={wedding} tier={tier} onAskBuzz={setBuzzAsk} onUpgrade={() => setShowPricing(true)} />}
       {view === 'guests' && <Guests wedding={wedding} tier={tier} onUpgrade={() => setShowPricing(true)} />}
       {view === 'budget' && <Budget wedding={wedding} tier={tier} onEditWedding={() => setShowEdit(true)} onUpgrade={() => setShowPricing(true)} />}
+      {view === 'day' && <OnTheDay wedding={wedding} tier={tier} onAskBuzz={setBuzzAsk} onUpgrade={() => setShowPricing(true)} />}
 
       {view === 'plan' && <>
       <div className="card this-week">
