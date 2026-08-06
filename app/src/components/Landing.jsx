@@ -28,6 +28,21 @@ const TIERS = [
   { name: 'Luxe', price: '£18.99', per: '/month · or £129/yr', blurb: 'The full monty.', features: ['Unlimited Buzz + venue research', 'Enquiry email drafting', 'Seating planner & day-of schedule', 'Crisis replanning'] },
 ]
 
+const FAQS = [
+  ['Is Wedding Planner Pro free?',
+   'Yes. Your full task plan and timeline, a 50-guest list, budget and supplier tracking, and a Buzz taster are free forever. Paid plans — Sparkle (£8.99/mo) and Luxe (£18.99/mo) — add unlimited everything and more of Buzz, each with a 7-day free trial.'],
+  ['What is Buzz?',
+   'Buzz is your AI wedding planner. Ask her anything, any time — she knows your date, budget and progress, researches real venues and suppliers near you with ratings and contact details, and even drafts your enquiry emails for you to send.'],
+  ['How much does a wedding planner cost in the UK?',
+   'A professional wedding planner typically costs £3,000 or more. Wedding Planner Pro gives you the same job — a complete plan timed to your day, plus an AI planner who researches and organises everything — from free.'],
+  ['Does it work for UK weddings?',
+   'Yes — it is built for UK couples: 140 expert tasks timed to your date, honest UK cost benchmarks, and reminders for legal steps like giving your 29-day notice at the register office. Marrying abroad? The paperwork tasks adapt to your destination.'],
+  ['Can it replace a real wedding planner?',
+   'It does the planning, research, budgeting and on-the-day running order a planner does, for a tiny fraction of the cost. And if you do hire a planner, you can use Wedding Planner Pro alongside them.'],
+  ['What devices does it work on?',
+   'It works in any web browser and as apps on iPhone and Android. Your plan stays in sync across all of them and feeds straight into your phone\'s calendar.'],
+]
+
 export default function Landing() {
   const toTop = () => document.getElementById('signup')?.scrollIntoView({ behavior: 'smooth' })
 
@@ -88,6 +103,16 @@ export default function Landing() {
         <h3>Be one of our 50 founding couples 💛</h3>
         <p>We're launching with fifty couples who'll shape the product — and get their first month of any plan free with code <strong>FOUNDING50</strong> at checkout.</p>
         <button type="button" onClick={toTop}>Claim a founding spot</button>
+      </section>
+
+      <section className="landing-faq">
+        <h2>Questions couples ask</h2>
+        {FAQS.map(([q, a]) => (
+          <div key={q} className="faq-item">
+            <h3>{q}</h3>
+            <p>{a}</p>
+          </div>
+        ))}
       </section>
 
       <footer className="landing-footer">

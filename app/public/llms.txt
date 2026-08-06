@@ -1,0 +1,23 @@
+# Wedding Planner Pro
+
+> Wedding Planner Pro is an AI wedding planning app for UK couples. Its AI planner, Buzz, builds a complete wedding plan timed to your date, researches real venues and suppliers, tracks guests and budget, and helps you run the day. Free to start; paid plans from £8.99/month.
+
+## What it does
+- Buzz, an AI wedding planner: researches real UK venues and suppliers near you with Google ratings and contact details, drafts enquiry emails you can send, and answers any planning question.
+- A plan that plans itself: 140 expert UK wedding tasks auto-scheduled to your date, including the 29-day register-office legal notice most couples miss.
+- Guest list with RSVPs and dietary needs, a budget tracker with honest UK benchmarks, a supplier pipeline, an on-the-day running order, and live calendar sync.
+- Delegate tasks to your wedding party by email, and (Luxe) have Buzz build your wedding-day running order.
+
+## Pricing
+- Free forever: full task plan and timeline, 50-guest list, budget and suppliers, a Buzz taster.
+- Sparkle — £8.99/month (or £59/year): unlimited guests, budget and suppliers, 200 Buzz messages/month.
+- Luxe — £18.99/month (or £129/year): unlimited Buzz and venue research, enquiry email drafting, on-the-day running order.
+- Every paid plan starts with a 7-day free trial.
+
+## Links
+- Website: https://www.weddingplannerpro.co.uk/
+- Google Play: https://play.google.com/store/apps/details?id=uk.co.weddingplannerpro.mobile
+- Privacy policy: https://www.weddingplannerpro.co.uk/privacy.html
+
+## About
+Wedding Planner Pro is operated by Beat the Bookie Ltd (United Kingdom). Contact: help@weddingplannerpro.co.uk
