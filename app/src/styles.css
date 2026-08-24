@@ -243,6 +243,8 @@ label { font-weight: 600; font-size: 14px; }
 .faq-item { margin: 14px 0; }
 .faq-item h3 { margin: 0 0 4px; font-size: 1.05rem; }
 .faq-item p { margin: 0; }
+.logo-hero-icon { border-radius: 22%; box-shadow: 0 10px 30px rgba(0,0,0,.10); }
+.nav-icon { border-radius: 22%; }
 .bubble.assistant a, .meta a { color: var(--teal); word-break: break-all; }
 
 /* Landing page */

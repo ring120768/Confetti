@@ -49,13 +49,13 @@ export default function Landing() {
   return (
     <div className="landing">
       <header className="landing-nav">
-        <img src="/heart.png" alt="" />
+        <img src="/app-icon.png" alt="" className="nav-icon" />
         <strong>Wedding Planner Pro</strong>
         <button type="button" className="secondary" onClick={toTop}>Sign in</button>
       </header>
 
       <section className="hero" id="signup">
-        <img src="/buzz-heart-web.png" alt="Buzz, your AI wedding planner, inside a heart of confetti" className="logo-hero logo-hero-buzz" />
+        <img src="/app-icon.png" alt="Wedding Planner Pro — Buzz, your AI wedding planner" className="logo-hero logo-hero-icon" />
         <h1>The wedding planner you didn't think you could afford</h1>
         <p className="sub">A professional planner costs £3,000+. Wedding Planner Pro gives you the same job description — a complete plan timed to your day, and Buzz, an AI planner who researches venues, chases what's late, and even drafts your emails — from free.</p>
         <EmailSignIn />
